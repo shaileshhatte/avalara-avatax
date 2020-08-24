@@ -35,7 +35,6 @@ export function responseBodyAsHtml(data: string, contentType: string): string {
 
 	htmlContent += `<div>
 						<div class='action-buttons-div'>
-						<div class="icon"><i class="codicon codicon-chrome-restore"></i> chrome-restore</div>
                             <input id='btn-copy' class='btn-copy' type='button' value='Copy'/>
                             <input id='btn-save' class='btn-save' type='button' value='Save'/>
                         </div>
@@ -74,13 +73,6 @@ function getStyleTagContent(): string {
 	try {
 		const nonce = nonceutil.getNonce();
 		const avacontext: vscode.ExtensionContext = AvaWebView.extensionContext;
-
-		const codiconsUri = AvaWebView.getOrCreateResponseViewPanel().webview.asWebviewUri(
-			vscode.Uri.joinPath(avacontext.extensionUri, 'node_modules', 'vscode-codicons', 'dist', 'codicon.css')
-		);
-		const codiconsFontUri = AvaWebView.getOrCreateResponseViewPanel().webview.asWebviewUri(
-			vscode.Uri.joinPath(avacontext.extensionUri, 'node_modules', 'vscode-codicons', 'dist', 'codicon.ttf')
-		);
 
 		const stylePathOnDisk = vscode.Uri.joinPath(avacontext.extensionUri, 'static', 'css', 'responseStyle.css');
 		console.log(stylePathOnDisk);
