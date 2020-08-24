@@ -1,0 +1,23 @@
+body {
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+}
+
+.json-key {
+	color: #89d0d4;
+}
+
+.json-number {
+	color: #d8d842;
+}
+
+.json-string {
+	color: var(--vscode-editor-foreground);
+}
+
+.json-boolean {
+	color: #3fcc27;
+}
+
+.monospace {
+	font-family: input, menlo, lucida console, monospace;
+}
