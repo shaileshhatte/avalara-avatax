@@ -11,7 +11,8 @@
 	],
 	"activationEvents": [
 		"onView:api-endpoints",
-		"onView:request-models"
+		"onView:request-models",
+		"onCommand:endpoint.launch"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -19,8 +20,7 @@
 			{
 				"command": "endpoint.launch",
 				"title": "Launch Endpoint",
-				"category": "Avalara",
-				"enablement": "view == api-endpoints && viewItem == endpoint"
+				"category": "Avalara"
 			}
 		],
 		"viewsContainers": {
@@ -44,6 +44,12 @@
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "avatax-api-explorer",
+				"contents": "No endpoint found, or Swagger.json not loaded properly."
+			}
+		],
 		"menus": {
 			"view/item/context": [
 				{

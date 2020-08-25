@@ -2,6 +2,12 @@ import * as vscode from 'vscode';
 import * as swaggerJson from '../data/swagger.json';
 import { EndpointMethod } from '../models/EndpointMethod';
 
+let tags: string[] = [];
+let endpoints: Map<string, EndpointMethod[]> = new Map();
+
+/**
+ * Endpoint item in the API endpoints treeview
+ */
 class EndpointTreeItem extends vscode.TreeItem {
 	constructor(public readonly endpoint: EndpointMethod) {
 		super(endpoint.urlLabel, vscode.TreeItemCollapsibleState.None);
@@ -28,11 +34,10 @@ class ApiCategory extends vscode.TreeItem {
 		super(label, collapsibleState);
 	}
 }
-
+/**
+ * Tree data provider that provides tree data for API Endpoints view
+ */
 export class EndPointsProvider implements vscode.TreeDataProvider<EndpointTreeItem | ApiCategory> {
-	public tags: string[] = [];
-	public endpoints: Map<string, EndpointMethod[]> = new Map();
-
 	getTreeItem(element: EndpointTreeItem | ApiCategory): vscode.TreeItem {
 		return element;
 	}
@@ -40,74 +45,169 @@ export class EndPointsProvider implements vscode.TreeDataProvider<EndpointTreeIt
 	getChildren(element?: ApiCategory | EndpointTreeItem): Thenable<EndpointTreeItem[] | ApiCategory[]> {
 		if (element instanceof ApiCategory) {
 			// console.log();
-			return Promise.resolve(this.generateApiEndpointTreeItems(element.label));
+			return Promise.resolve(generateApiEndpointTreeItems(element.label));
 		} else {
-			return Promise.resolve(this.generateTags());
+			return Promise.resolve(generateApiCategories());
 		}
 	}
+}
 
-	generateTags(): ApiCategory[] {
-		const apiCategories: ApiCategory[] = [];
+/**
+ * A generic class to create quick pick item
+ */
+export class EndpointQuickPickItem implements vscode.QuickPickItem {
+	label: string;
+	description?: string | undefined;
+	detail?: string | undefined;
+	endpoint: EndpointMethod;
 
-		const paths: any = swaggerJson.paths;
+	constructor(label: string, description: string, detail: string, ep: EndpointMethod) {
+		this.label = label;
+		this.description = description;
+		this.detail = detail;
+		this.endpoint = ep;
+	}
+}
 
-		Object.keys(paths).forEach((url) => {
-			const methods = Object.keys(paths[url]);
-			methods.forEach((method) => {
-				const m = paths[url][method];
-				const tagsArray = m.tags;
-				for (let i = 0; i < tagsArray.length; i++) {
-					let tag = tagsArray[i];
-					if (!this.tags.includes(tag)) {
-						this.tags.push(tag);
-					}
-					if (this.endpoints.has(tag)) {
-						let tempEndpoints: EndpointMethod[] = [];
-						tempEndpoints = this.endpoints.get(tag) || [];
-						tempEndpoints?.push(this.createEndpointMethod(url, method, tag, m));
-						this.endpoints.set(tag, tempEndpoints);
-					} else {
-						let tempEndpoints: EndpointMethod[] = [];
-						tempEndpoints.push(this.createEndpointMethod(url, method, tag, m));
-						this.endpoints.set(tag, tempEndpoints);
-					}
+/**
+ * A generic class to create quick pick item
+ */
+export class ApiCategoryQuickPickItem implements vscode.QuickPickItem {
+	label: string;
+	description?: string | undefined;
+	detail?: string | undefined;
+
+	constructor(label: string, description: string, detail: string) {
+		this.label = label;
+		this.description = description;
+		this.detail = detail;
+	}
+}
+
+/**
+ * Generates API categories from API specification file (Swagger.json)
+ */
+function generateApiCategories(): ApiCategory[] {
+	const apiCategories: ApiCategory[] = [];
+
+	const paths: any = swaggerJson.paths;
+
+	Object.keys(paths).forEach((url) => {
+		const methods = Object.keys(paths[url]);
+		methods.forEach((method) => {
+			const m = paths[url][method];
+			const tagsArray = m.tags;
+			for (let i = 0; i < tagsArray.length; i++) {
+				let tag = tagsArray[i];
+				if (!tags.includes(tag)) {
+					tags.push(tag);
 				}
-			});
+				if (endpoints.has(tag)) {
+					let tempEndpoints: EndpointMethod[] = [];
+					tempEndpoints = endpoints.get(tag) || [];
+					tempEndpoints?.push(createEndpointMethod(url, method, tag, m));
+					endpoints.set(tag, tempEndpoints);
+				} else {
+					let tempEndpoints: EndpointMethod[] = [];
+					tempEndpoints.push(createEndpointMethod(url, method, tag, m));
+					endpoints.set(tag, tempEndpoints);
+				}
+			}
 		});
+	});
 
-		this.tags.forEach((tag) => {
-			const apiCategory: ApiCategory = new ApiCategory(tag, vscode.TreeItemCollapsibleState.Collapsed);
-			apiCategories.push(apiCategory);
-		});
+	tags.forEach((tag) => {
+		const apiCategory: ApiCategory = new ApiCategory(tag, vscode.TreeItemCollapsibleState.Collapsed);
+		apiCategories.push(apiCategory);
+	});
 
-		return apiCategories;
-	}
+	return apiCategories;
+}
 
-	createEndpointMethod(url: string, method: string, tag: string, ep: any): EndpointMethod {
-		return new EndpointMethod(
-			url,
-			method,
-			tag,
-			ep.summary,
-			ep.description,
-			ep.operationId,
-			ep.consumes,
-			ep.produces,
-			ep.parameters,
-			ep.responses,
-			ep.security
-		);
-	}
+/**
+ * Creates an endpoint of of type 'EndpointMethod' with given parameters.
+ * @param url URL of an endpoint
+ * @param method Method (e.g. GET, POST) of the endpoint
+ * @param tag API category this endpoint belongs to
+ * @param ep Endpoint object from the API specification file (Swagger.json)
+ */
+function createEndpointMethod(url: string, method: string, tag: string, ep: any): EndpointMethod {
+	return new EndpointMethod(
+		url,
+		method,
+		tag,
+		ep.summary,
+		ep.description,
+		ep.operationId,
+		ep.consumes,
+		ep.produces,
+		ep.parameters,
+		ep.responses,
+		ep.security
+	);
+}
 
-	generateApiEndpointTreeItems(tag: string): EndpointTreeItem[] {
-		const endpointMethods: EndpointMethod[] = this.endpoints.get(tag) || [];
-		const endpointTreeItems: EndpointTreeItem[] = [];
-
+/**
+ * Generates API endpoints for a given API category
+ * @param tag An API category (e.g. accounts, transactions etc.)
+ */
+function generateApiEndpointTreeItems(tag: string): EndpointTreeItem[] {
+	const endpointMethods: EndpointMethod[] = endpoints.get(tag) || [];
+	const endpointTreeItems: EndpointTreeItem[] = [];
+	try {
 		endpointMethods.forEach((em) => {
 			let et = new EndpointTreeItem(em);
 			endpointTreeItems.push(et);
 		});
-
-		return endpointTreeItems;
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
 	}
+
+	return endpointTreeItems;
+}
+
+/**
+ * Generates all available API categories from API specification
+ */
+export function generateApiCategoryQuickPickItems(): ApiCategoryQuickPickItem[] {
+	let quickPickItems: ApiCategoryQuickPickItem[] = [];
+	try {
+		console.log(`generateApiCategoryQuickPickItems --> ${generateApiCategories().length}`);
+		const apiCategories: ApiCategory[] = generateApiCategories();
+
+		apiCategories.forEach((apiCategory) => {
+			const qpItem: ApiCategoryQuickPickItem = new ApiCategoryQuickPickItem(apiCategory.label, apiCategory.label, apiCategory.label);
+			quickPickItems.push(qpItem);
+		});
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+	return quickPickItems;
+}
+
+/**
+ * Generates API endpoints for provided API category
+ * @param apiCategory API category to fetch API endpoints for
+ */
+export function generateApiEndpointQuickPickItems(apiCategory: string): EndpointQuickPickItem[] {
+	let quickPickItems: EndpointQuickPickItem[] = [];
+	try {
+		console.log(`generateApiEndpointsQuickPickItems --> ${generateApiEndpointTreeItems(apiCategory).length}`);
+		const apiEndpoints: EndpointTreeItem[] = generateApiEndpointTreeItems(apiCategory);
+		apiEndpoints.forEach((ep) => {
+			const qpItem: EndpointQuickPickItem = new EndpointQuickPickItem(
+				ep.label || ep.endpoint.urlLabel,
+				ep.description,
+				ep.endpoint.description,
+				ep.endpoint
+			);
+			quickPickItems.push(qpItem);
+		});
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+	return quickPickItems;
 }

@@ -219,17 +219,17 @@ const LANGUAGE_ITEMS = [
 	}
 ];
 
-const SHELL_LANG = 'shell';
-const JAVASCRIPT_LANG = 'javaScript';
-const NODEJS_LANG = 'node';
-const JAVA_LANG = 'java';
-const CSHARP_LANG = 'csharp';
-const PHP_LANG = 'php';
-const PYTHON_LANG = 'python';
-const RUBY_LANG = 'ruby';
-const SWIFT_LANG = 'swift';
-const C_LANG = 'c';
-const GO_LANG = 'go';
+// const SHELL_LANG = 'shell';
+// const JAVASCRIPT_LANG = 'javaScript';
+// const NODEJS_LANG = 'node';
+// const JAVA_LANG = 'java';
+// const CSHARP_LANG = 'csharp';
+// const PHP_LANG = 'php';
+// const PYTHON_LANG = 'python';
+// const RUBY_LANG = 'ruby';
+// const SWIFT_LANG = 'swift';
+// const C_LANG = 'c';
+// const GO_LANG = 'go';
 
 let svcResult: AxiosResponse;
 

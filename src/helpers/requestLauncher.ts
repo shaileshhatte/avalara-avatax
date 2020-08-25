@@ -5,8 +5,9 @@ import { AvaWebView } from '../util/basewebview';
 import { EndpointMethod } from '../models/EndpointMethod';
 import * as requestGenerator from './requestGenerator';
 import * as requestWebviewClient from '../util/requestPanelClient';
-
 import * as nonceutil from '../util/nonceutil';
+
+import { generateApiCategoryQuickPickItems, generateApiEndpointQuickPickItems } from '../providers/endpointsProvider';
 
 /**
  * Launches a request webviewpanel for an endpoint
@@ -15,24 +16,39 @@ import * as nonceutil from '../util/nonceutil';
  * @returns void
  */
 export function launchEndpoint(): void {
+	let endpoint: EndpointMethod | undefined;
 	try {
-		// console.log(context.extensionUri);
-		// console.log(arguments[0]);
-		if (!arguments) {
-			// console.error(`Command invoked without any arguments.`);
-			vscode.window.showErrorMessage('Illegal command.');
-			return;
-		}
-		const endpoint: EndpointMethod = arguments[0];
-		const requestPanelTitle: string = `${endpoint.method.toUpperCase()} ${endpoint.operationId}`;
+		if (arguments[0]) {
+			endpoint = arguments[0];
+			if (!endpoint) {
+				console.log(`Couldn't assign endpoint.`);
+				vscode.window.showErrorMessage(`Something went wrong. Couldn't assign endpoint.`);
+				return;
+			}
 
-		const panel: vscode.WebviewPanel | undefined = AvaWebView.getOrCreateRequestViewPanel(requestPanelTitle);
-		if (panel) {
-			panel.webview.html = generateRequestWebviewContent(endpoint);
+			launchEndpointView(endpoint);
+		} else {
+			launchEndpointViaCommand();
 		}
 	} catch (err) {
 		console.error(err);
 		vscode.window.showInformationMessage(err);
+	}
+}
+
+function launchEndpointView(endpoint: EndpointMethod) {
+	try {
+		if (endpoint) {
+			const requestPanelTitle: string = `${endpoint.method.toUpperCase()} ${endpoint.operationId}`;
+
+			const panel: vscode.WebviewPanel | undefined = AvaWebView.getOrCreateRequestViewPanel(requestPanelTitle);
+			if (panel) {
+				panel.webview.html = generateRequestWebviewContent(endpoint);
+			}
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
 	}
 }
 
@@ -61,4 +77,49 @@ function generateRequestWebviewContent(endpoint: EndpointMethod): string {
 		`;
 
 	return htmlContent;
+}
+
+function launchEndpointViaCommand(): void {
+	try {
+		vscode.window
+			.showQuickPick(generateApiCategoryQuickPickItems(), {
+				matchOnDescription: true,
+				placeHolder: `Select an API category to launch an endpoint`,
+				matchOnDetail: true
+			})
+			.then(
+				(pickedItem) => {
+					console.log(`${pickedItem?.label} ${pickedItem?.description} ${pickedItem?.detail}`);
+					vscode.window.showInformationMessage(`${pickedItem?.label} ${pickedItem?.description} ${pickedItem?.detail}`);
+
+					if (pickedItem?.label) {
+						const apiEndpoints = generateApiEndpointQuickPickItems(pickedItem?.label);
+						vscode.window
+							.showQuickPick(generateApiEndpointQuickPickItems(pickedItem.label), {
+								matchOnDescription: true,
+								matchOnDetail: true,
+								placeHolder: `Choose an API endpoint to launch`
+							})
+							.then(
+								(epItem) => {
+									if (epItem) {
+										launchEndpointView(epItem.endpoint);
+									}
+								},
+								(err) => {
+									console.error(err);
+									vscode.window.showErrorMessage(err);
+								}
+							);
+					}
+				},
+				(err) => {
+					console.error(err);
+					vscode.window.showErrorMessage(err);
+				}
+			);
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
 }
