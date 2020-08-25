@@ -7,7 +7,11 @@ import * as requestGenerator from './requestGenerator';
 import * as requestWebviewClient from '../util/requestPanelClient';
 import * as nonceutil from '../util/nonceutil';
 
-import { generateApiCategoryQuickPickItems, generateApiEndpointQuickPickItems } from '../providers/endpointsProvider';
+import {
+	generateApiCategoryQuickPickItems,
+	generateApiEndpointQuickPickItems,
+	getTaxCalculationEndpoint
+} from '../providers/endpointsProvider';
 
 /**
  * Launches a request webviewpanel for an endpoint
@@ -45,6 +49,34 @@ function launchEndpointView(endpoint: EndpointMethod) {
 			if (panel) {
 				panel.webview.html = generateRequestWebviewContent(endpoint);
 			}
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+}
+
+export function launchTaxCalculationEndpoint() {
+	let taxCalculationEndpoint: EndpointMethod | undefined;
+
+	try {
+		taxCalculationEndpoint = getTaxCalculationEndpoint();
+		if (taxCalculationEndpoint) {
+			launchEndpointView(taxCalculationEndpoint);
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+}
+
+export function launchAddressCalculationEndpoint() {
+	let addressValidationEndpoint: EndpointMethod | undefined;
+
+	try {
+		addressValidationEndpoint = getTaxCalculationEndpoint();
+		if (addressValidationEndpoint) {
+			launchEndpointView(addressValidationEndpoint);
 		}
 	} catch (err) {
 		console.error(err);

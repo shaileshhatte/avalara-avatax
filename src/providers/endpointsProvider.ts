@@ -211,3 +211,45 @@ export function generateApiEndpointQuickPickItems(apiCategory: string): Endpoint
 	}
 	return quickPickItems;
 }
+
+export function getTaxCalculationEndpoint(): EndpointMethod | undefined {
+	let taxCalcEndpoint: EndpointMethod | undefined;
+
+	const paths: any = swaggerJson.paths;
+
+	try {
+		Object.keys(paths).forEach((url) => {
+			if (url === `/api/v2/transactions/create`) {
+				const method = 'post';
+				const methodObj = paths[url][method];
+				taxCalcEndpoint = createEndpointMethod(url, method, 'Transactions', methodObj);
+			}
+		});
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+
+	return taxCalcEndpoint;
+}
+
+export function getAddressValidationEndpoint(): EndpointMethod | undefined {
+	let addressValidationEndpoint: EndpointMethod | undefined;
+
+	const paths: any = swaggerJson.paths;
+
+	try {
+		Object.keys(paths).forEach((url) => {
+			if (url === `/api/v2/addresses/resolve`) {
+				const method = 'post';
+				const methodObj = paths[url][method];
+				addressValidationEndpoint = createEndpointMethod(url, method, 'addresses', methodObj);
+			}
+		});
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+
+	return addressValidationEndpoint;
+}

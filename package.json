@@ -12,14 +12,26 @@
 	"activationEvents": [
 		"onView:api-endpoints",
 		"onView:request-models",
-		"onCommand:endpoint.launch"
+		"onCommand:endpoint.launch",
+		"onCommand:taxendpoint.launch",
+		"onCommand:addressendpoint.launch"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "endpoint.launch",
-				"title": "Launch Endpoint",
+				"title": "Launch API Request",
+				"category": "Avalara"
+			},
+			{
+				"command": "taxendpoint.launch",
+				"title": "Launch Tax Request",
+				"category": "Avalara"
+			},
+			{
+				"command": "addressendpoint.launch",
+				"title": "Launch Address Validation Request",
 				"category": "Avalara"
 			}
 		],
