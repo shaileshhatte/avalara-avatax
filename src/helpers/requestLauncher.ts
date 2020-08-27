@@ -21,6 +21,7 @@ import {
  */
 export function launchEndpoint(): void {
 	let endpoint: EndpointMethod | undefined;
+
 	try {
 		if (arguments[0]) {
 			endpoint = arguments[0];

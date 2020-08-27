@@ -14,11 +14,17 @@
 		"onView:request-models",
 		"onCommand:endpoint.launch",
 		"onCommand:taxendpoint.launch",
-		"onCommand:addressendpoint.launch"
+		"onCommand:addressendpoint.launch",
+		"onCommand:avatax.setup"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
+			{
+				"command": "avatax.setup",
+				"title": "Setup AvaTax Credentials",
+				"category": "Avalara"
+			},
 			{
 				"command": "endpoint.launch",
 				"title": "Launch API Request",
@@ -97,24 +103,24 @@
 				"avalara.avataxaccountnumber": {
 					"type": "string",
 					"default": "",
-					"scope": "window",
-					"description": "Avalara Account ID"
+					"scope": "application",
+					"description": "Avalara Account ID or User Name"
 				},
 				"avalara.avataxlicensekey": {
 					"type": "string",
 					"default": "",
-					"scope": "window",
-					"description": "Account/API License Key"
+					"scope": "application",
+					"description": "API License Key or Account Password"
 				},
 				"avalara.requesttimeout": {
 					"type": "number",
 					"default": 0,
-					"scope": "window",
+					"scope": "application",
 					"description": "Specifies the number of milliseconds before the request times out. Default is '0' (No timeout)."
 				},
 				"avalara.environment": {
 					"default": "Sandbox",
-					"scope": "window",
+					"scope": "application",
 					"description": "Specifies the type of AvaTax API environment.",
 					"type": "string",
 					"enum": [
@@ -156,6 +162,7 @@
 		"httpsnippet": "^1.22.0",
 		"js-base64": "^3.4.5",
 		"json-beautify": "^1.1.1",
+		"keytar": "^6.0.1",
 		"pretty-print-json": "^0.2.2",
 		"xml-formatter": "^2.1.3"
 	}

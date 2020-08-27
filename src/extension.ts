@@ -4,6 +4,7 @@ import { launchEndpoint, launchTaxCalculationEndpoint, launchAddressCalculationE
 import { DefinitionsProvider } from './providers/definitionsProvider';
 import { launchModel } from './helpers/requestHelper';
 import { AvaWebView } from './util/basewebview';
+import { setupAvataxCredentials, deleteCredentials } from './util/authenticator';
 
 export function activate(context: vscode.ExtensionContext) {
 	// API Endpoints provider
@@ -21,6 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	AvaWebView.extensionContext = context;
+
+	// Setup AvaTax credentials
+	const setupCredentialsDisposable = vscode.commands.registerCommand('avatax.setup', setupAvataxCredentials);
 	// Launch endpoint command
 	const epLaunchDisposable = vscode.commands.registerCommand('endpoint.launch', launchEndpoint);
 	const modelLaunchDisposable = vscode.commands.registerCommand('model.launch', launchModel);
@@ -33,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		apiEndpointsProviderDisposable,
 		definitionsProviderDisposable,
+		setupCredentialsDisposable,
 		epLaunchDisposable,
 		modelLaunchDisposable,
 		epTaxLaunchDisposable,
@@ -41,4 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	// Delete account credentials from the system keychain
+	deleteCredentials();
+}
