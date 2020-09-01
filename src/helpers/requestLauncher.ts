@@ -10,7 +10,8 @@ import * as nonceutil from '../util/nonceutil';
 import {
 	generateApiCategoryQuickPickItems,
 	generateApiEndpointQuickPickItems,
-	getTaxCalculationEndpoint
+	getTaxCalculationEndpoint,
+	getAddressValidationEndpoint
 } from '../providers/endpointsProvider';
 
 /**
@@ -21,7 +22,6 @@ import {
  */
 export function launchEndpoint(): void {
 	let endpoint: EndpointMethod | undefined;
-
 	try {
 		if (arguments[0]) {
 			endpoint = arguments[0];
@@ -30,7 +30,6 @@ export function launchEndpoint(): void {
 				vscode.window.showErrorMessage(`Something went wrong. Couldn't assign endpoint.`);
 				return;
 			}
-
 			launchEndpointView(endpoint);
 		} else {
 			launchEndpointViaCommand();
@@ -41,25 +40,8 @@ export function launchEndpoint(): void {
 	}
 }
 
-function launchEndpointView(endpoint: EndpointMethod) {
-	try {
-		if (endpoint) {
-			const requestPanelTitle: string = `${endpoint.method.toUpperCase()} ${endpoint.operationId}`;
-
-			const panel: vscode.WebviewPanel | undefined = AvaWebView.getOrCreateRequestViewPanel(requestPanelTitle);
-			if (panel) {
-				panel.webview.html = generateRequestWebviewContent(endpoint);
-			}
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage(err);
-	}
-}
-
 export function launchTaxCalculationEndpoint() {
 	let taxCalculationEndpoint: EndpointMethod | undefined;
-
 	try {
 		taxCalculationEndpoint = getTaxCalculationEndpoint();
 		if (taxCalculationEndpoint) {
@@ -73,11 +55,25 @@ export function launchTaxCalculationEndpoint() {
 
 export function launchAddressCalculationEndpoint() {
 	let addressValidationEndpoint: EndpointMethod | undefined;
-
 	try {
-		addressValidationEndpoint = getTaxCalculationEndpoint();
+		addressValidationEndpoint = getAddressValidationEndpoint();
 		if (addressValidationEndpoint) {
 			launchEndpointView(addressValidationEndpoint);
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+}
+
+function launchEndpointView(endpoint: EndpointMethod) {
+	try {
+		if (endpoint) {
+			const requestPanelTitle: string = `${endpoint.method.toUpperCase()} ${endpoint.operationId}`;
+			const panel: vscode.WebviewPanel | undefined = AvaWebView.getOrCreateRequestViewPanel(requestPanelTitle);
+			if (panel) {
+				panel.webview.html = generateRequestWebviewContent(endpoint);
+			}
 		}
 	} catch (err) {
 		console.error(err);
@@ -112,45 +108,26 @@ function generateRequestWebviewContent(endpoint: EndpointMethod): string {
 	return htmlContent;
 }
 
-function launchEndpointViaCommand(): void {
+async function launchEndpointViaCommand() {
 	try {
-		vscode.window
-			.showQuickPick(generateApiCategoryQuickPickItems(), {
-				matchOnDescription: true,
-				placeHolder: `Select an API category to launch an endpoint`,
-				matchOnDetail: true
-			})
-			.then(
-				(pickedItem) => {
-					console.log(`${pickedItem?.label} ${pickedItem?.description} ${pickedItem?.detail}`);
-					vscode.window.showInformationMessage(`${pickedItem?.label} ${pickedItem?.description} ${pickedItem?.detail}`);
+		const pickedItem = await vscode.window.showQuickPick(generateApiCategoryQuickPickItems(), {
+			matchOnDescription: true,
+			placeHolder: `Select an API category to launch an endpoint`,
+			matchOnDetail: true
+		});
 
-					if (pickedItem?.label) {
-						const apiEndpoints = generateApiEndpointQuickPickItems(pickedItem?.label);
-						vscode.window
-							.showQuickPick(generateApiEndpointQuickPickItems(pickedItem.label), {
-								matchOnDescription: true,
-								matchOnDetail: true,
-								placeHolder: `Choose an API endpoint to launch`
-							})
-							.then(
-								(epItem) => {
-									if (epItem) {
-										launchEndpointView(epItem.endpoint);
-									}
-								},
-								(err) => {
-									console.error(err);
-									vscode.window.showErrorMessage(err);
-								}
-							);
-					}
-				},
-				(err) => {
-					console.error(err);
-					vscode.window.showErrorMessage(err);
+		if (pickedItem?.label) {
+			const epItem = await vscode.window.showQuickPick(generateApiEndpointQuickPickItems(pickedItem.label), {
+				matchOnDescription: true,
+				matchOnDetail: true,
+				placeHolder: `Choose an API endpoint to launch`
+			});
+			if (epItem) {
+				if (epItem) {
+					launchEndpointView(epItem.endpoint);
 				}
-			);
+			}
+		}
 	} catch (err) {
 		console.error(err);
 		vscode.window.showErrorMessage(err);

@@ -214,9 +214,7 @@ export function generateApiEndpointQuickPickItems(apiCategory: string): Endpoint
 
 export function getTaxCalculationEndpoint(): EndpointMethod | undefined {
 	let taxCalcEndpoint: EndpointMethod | undefined;
-
 	const paths: any = swaggerJson.paths;
-
 	try {
 		Object.keys(paths).forEach((url) => {
 			if (url === `/api/v2/transactions/create`) {
@@ -229,7 +227,6 @@ export function getTaxCalculationEndpoint(): EndpointMethod | undefined {
 		console.error(err);
 		vscode.window.showErrorMessage(err);
 	}
-
 	return taxCalcEndpoint;
 }
 

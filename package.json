@@ -32,12 +32,12 @@
 			},
 			{
 				"command": "taxendpoint.launch",
-				"title": "Launch Tax Request",
+				"title": "Tax Calculation (CreateTransaction)",
 				"category": "Avalara"
 			},
 			{
 				"command": "addressendpoint.launch",
-				"title": "Launch Address Validation Request",
+				"title": "Address Validation (ResolvePost)",
 				"category": "Avalara"
 			}
 		],

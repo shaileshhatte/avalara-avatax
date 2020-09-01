@@ -88,28 +88,35 @@
 
 		// Collect header values
 		let headerInputBoxes = document.getElementsByClassName('input-header');
-		let headerValues = [];
-
+		let headerValues = {};
 		for (let i = 0; i < headerInputBoxes.length; i++) {
 			let inputBox = headerInputBoxes[i];
-			let ho = {};
+			// let ho = {};
 			let paramName = inputBox.getAttribute('data-paramname').trim();
 			let paramValue = inputBox.value.trim() || '';
-			ho[paramName] = paramValue;
-			headerValues.push(ho);
+
+			if (paramValue === '') {
+				continue;
+			}
+
+			headerValues[paramName] = paramValue;
 		}
 
 		// Collect query values
 		let queryInputBoxes = document.getElementsByClassName('input-query');
-		let queryValues = [];
-
+		let queryValues = {};
 		for (let j = 0; j < queryInputBoxes.length; j++) {
 			let inputBox = queryInputBoxes[j];
 			let ho = {};
 			let paramName = inputBox.getAttribute('data-paramname').trim();
 			let paramValue = inputBox.value.trim() || '';
-			ho[paramName] = paramValue;
-			queryValues.push(ho);
+
+			if (paramValue === '') {
+				continue;
+			}
+			// ho[paramName] = paramValue;
+			// queryValues.push(ho);
+			queryValues[paramName] = paramValue;
 		}
 
 		vscode.postMessage({

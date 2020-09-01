@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { EndPointsProvider } from './providers/endpointsProvider';
 import { launchEndpoint, launchTaxCalculationEndpoint, launchAddressCalculationEndpoint } from './helpers/requestLauncher';
 import { DefinitionsProvider } from './providers/definitionsProvider';
-import { launchModel } from './helpers/requestHelper';
+import { launchModel } from './util/requestPanelClient';
 import { AvaWebView } from './util/basewebview';
 import { setupAvataxCredentials, deleteCredentials } from './util/authenticator';
 

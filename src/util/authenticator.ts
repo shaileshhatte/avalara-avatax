@@ -1,20 +1,19 @@
-import { window, workspace } from 'vscode';
-import { getConfiguration } from './configurationProvider';
+import { window } from 'vscode';
+import { updateATConfiguration, getATConfiguration } from './configurationProvider';
 import * as keytar from 'keytar';
+import { error } from 'console';
+import { testConnection } from '../controllers/RequestController';
 // import { testConnectionToAvatax } from '../service/requestor';
 
 const keytarServiceName: string = `avalara.vscode.ext`;
-const avataxConfiguration: any = getConfiguration();
+const avataxAccountNumberConfigName = `avataxaccountnumber`;
 
 export async function setupAvataxCredentials() {
 	try {
-		// const storedAccountId: string = avataxConfiguration[`avataxaccountnumber`];
-
-		const storedAccountId: string = workspace.getConfiguration('avalara').get('avataxaccountnumber') || '';
-
+		const storedAccountId = getATConfiguration(avataxAccountNumberConfigName) || ``;
 		let avataxKey: string | undefined;
 		const enteredAccountId = await window.showInputBox({
-			value: storedAccountId || '',
+			value: (storedAccountId as string) || '',
 			prompt: `Your AvaTax Account ID or Username`,
 			ignoreFocusOut: true,
 			placeHolder: `Account ID or Username`
@@ -29,18 +28,22 @@ export async function setupAvataxCredentials() {
 			});
 
 			if (avataxKey) {
-				// await testConnection(enteredAccountId, avataxKey);
 				await setCredentials(enteredAccountId, avataxKey);
-				// await workspace.getConfiguration('avalara').update('avataxaccountnumber', enteredAccountId, true);
+				await updateATConfiguration(avataxAccountNumberConfigName, enteredAccountId); // Update account number in extension settings with the new one
+
+				// Popup with an option to test connection
 				const res = await window.showInformationMessage(`AvaTax credentials stored successfully!`, {
-					title: `Test Connection to AvaTax (Recommended)`,
+					title: `Test Connection (Recommended)`,
 					id: `yes`
 				});
+				if (res?.id === `yes`) {
+					await testConnection(enteredAccountId, avataxKey);
+				}
 			}
 
 			// Remove existing account credentials if not the same
 			if (enteredAccountId !== storedAccountId) {
-				deleteCredentials(storedAccountId);
+				deleteCredentials(storedAccountId as string);
 			}
 		}
 	} catch (err) {
@@ -60,9 +63,7 @@ async function setCredentials(accountid: string, key: string): Promise<void> {
 		return await keytar.setPassword(keytarServiceName, accountid, key);
 	} catch (err) {
 		console.error(err);
-		window.showErrorMessage(
-			`Credentials could not be stored. You may opt to store it in extension settings under Settings > Extensions > Avalara.`
-		);
+		window.showErrorMessage(`Credentials could not be stored in the system.`);
 	}
 }
 
@@ -74,14 +75,15 @@ export async function getCredentials(accountid: string): Promise<string | null> 
 	let storedAvataxKey: string | null = null;
 	try {
 		storedAvataxKey = await keytar.getPassword(keytarServiceName, accountid);
+		if (!storedAvataxKey) {
+			return Promise.reject(`AvaTax credentials may not be set up.`);
+		}
 	} catch (err) {
 		console.error(err);
-		window.showErrorMessage(
-			`Credentials could not be retrieved from the keychain/vault. You may opt to store it in extension settings under Settings > Extensions > Avalara.`
-		);
+		window.showErrorMessage(err);
 	}
 
-	return storedAvataxKey;
+	return Promise.resolve(storedAvataxKey);
 }
 
 /**
@@ -94,12 +96,12 @@ export async function deleteCredentials(accountId?: string) {
 	if (accountId) {
 		accountToRemove = accountId;
 	} else {
-		accountToRemove = avataxConfiguration[`avataxaccountnumber`];
+		accountToRemove = getATConfiguration(avataxAccountNumberConfigName);
 	}
-
 	try {
-		deletePromise = await keytar.deletePassword(keytarServiceName, accountToRemove);
-		// window.showInformationMessage(`Credentials for AvaTax account '${accountToRemove}' have been removed successfully.`);
+		if (accountToRemove) {
+			deletePromise = await keytar.deletePassword(keytarServiceName, accountToRemove as string);
+		}
 	} catch (err) {
 		console.error(err);
 		window.showErrorMessage(`Couldn't remove the AvaTax credentials: ${accountToRemove}. Error: ${err}`);

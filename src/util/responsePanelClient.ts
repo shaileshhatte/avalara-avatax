@@ -60,7 +60,6 @@ export function getHeadTagContent(): string {
 		console.error(err);
 		vscode.window.showErrorMessage(err);
 	}
-
 	return htmlContent;
 }
 
@@ -69,21 +68,16 @@ export function getHeadTagContent(): string {
  */
 function getStyleTagContent(): string {
 	let htmlContent: string = '';
-
 	try {
 		const nonce = nonceutil.getNonce();
 		const avacontext: vscode.ExtensionContext = AvaWebView.extensionContext;
-
 		const stylePathOnDisk = vscode.Uri.joinPath(avacontext.extensionUri, 'static', 'css', 'responseStyle.css');
-		console.log(stylePathOnDisk);
-
 		const styleUri = AvaWebView.getOrCreateResponseViewPanel().webview.asWebviewUri(stylePathOnDisk);
 		htmlContent += `<link nonce='${nonce}' rel='stylesheet' href='${styleUri}'>`;
 	} catch (err) {
 		console.error(err);
 		vscode.window.showErrorMessage(err);
 	}
-
 	return htmlContent;
 }
 
@@ -92,21 +86,15 @@ function getStyleTagContent(): string {
  */
 export function getScriptTagContent(): string {
 	let scriptContent: string = '';
-
 	try {
 		const avacontext: vscode.ExtensionContext = AvaWebView.extensionContext;
-
 		const scriptPathOnDisk = vscode.Uri.joinPath(avacontext.extensionUri, 'static', 'js', 'responseClient.js');
-		console.log(scriptPathOnDisk);
 		const nonce = nonceutil.getNonce();
-
 		const scriptUri = AvaWebView.getOrCreateResponseViewPanel().webview.asWebviewUri(scriptPathOnDisk);
-
 		scriptContent += `<script nonce='${nonce}' src='${scriptUri}'></script>`;
 	} catch (err) {
 		console.error(err);
 		vscode.window.showErrorMessage(err);
 	}
-
 	return scriptContent;
 }

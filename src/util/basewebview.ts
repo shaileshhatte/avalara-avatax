@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { makeRequest } from '../controllers/RequestController';
 
 import { copyResponseBody, saveResponseBody, generateSnippet } from '../helpers/responseHelper';
-import { showRequiredFieldsError, launchModel } from '../helpers/requestHelper';
+import { showRequiredFieldsError, launchModel } from '../util/requestPanelClient';
 
 const viewType: string = 'endpoint.launch';
 
@@ -42,7 +42,6 @@ export class AvaWebView {
 					panel.reveal(columnToShowIn);
 				}
 			}
-
 			// Check if the response panel exists. Create if doesn't exist.
 			if (!AvaWebView.resPanel) {
 				AvaWebView.resPanel = createWebView(`Response`);
