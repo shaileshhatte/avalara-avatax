@@ -114,21 +114,15 @@ export async function createAxiosConfig(data: any): Promise<AxiosConfiguration |
 	return requestConfiguration;
 }
 
-async function setATSettings(data?: any) {
-	if (data) {
-		ACCOUNT_NUMBER = data.accountNumber || ``;
-		LICENSE_KEY = data.licenseKey || ``;
-	} else {
-		try {
-			ACCOUNT_NUMBER = (getATConfiguration(avataxAccountNumberConfigName) as string) || ``;
-			LICENSE_KEY = (await getATLicenseKey(ACCOUNT_NUMBER)) || ``;
-		} catch (err) {
-			console.error(err);
-			window.showErrorMessage(err);
-		}
+async function setATSettings() {
+	try {
+		ACCOUNT_NUMBER = (getATConfiguration(avataxAccountNumberConfigName) as string) || ``;
+		LICENSE_KEY = (await getATLicenseKey(ACCOUNT_NUMBER)) || ``;
+		ENV_TYPE = (getATConfiguration(environmentConfigName) as string) || ``;
+		REQUEST_TIMEOUT = (getATConfiguration(requestTimeOutConfigName) as number) || 0;
+		BASE_URL = ENV_TYPE === 'Sandbox' ? SANDBOX_BASE_URL : PRODUCTION_BASE_URL;
+	} catch (err) {
+		console.error(err);
+		window.showErrorMessage(err);
 	}
-
-	ENV_TYPE = (getATConfiguration(environmentConfigName) as string) || ``;
-	REQUEST_TIMEOUT = (getATConfiguration(requestTimeOutConfigName) as number) || 0;
-	BASE_URL = ENV_TYPE === 'Sandbox' ? SANDBOX_BASE_URL : PRODUCTION_BASE_URL;
 }

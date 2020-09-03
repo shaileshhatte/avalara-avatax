@@ -20,7 +20,9 @@ class EndpointTreeItem extends vscode.TreeItem {
 	}
 
 	get tooltip(): string {
-		let tooltip = `Method: ${this.endpoint.method.toUpperCase()}\nOperation: ${this.endpoint.operationId}\n\n${this.endpoint.summary}`;
+		let tooltip = `${this.endpoint.urlLabel}\n\nMethod: ${this.endpoint.method.toUpperCase()}\nOperation: ${
+			this.endpoint.operationId
+		}\n\n${this.endpoint.summary}`;
 		return tooltip;
 	}
 
@@ -90,36 +92,41 @@ export class ApiCategoryQuickPickItem implements vscode.QuickPickItem {
 function generateApiCategories(): ApiCategory[] {
 	const apiCategories: ApiCategory[] = [];
 
-	const paths: any = swaggerJson.paths;
+	try {
+		const paths: any = swaggerJson.paths;
 
-	Object.keys(paths).forEach((url) => {
-		const methods = Object.keys(paths[url]);
-		methods.forEach((method) => {
-			const m = paths[url][method];
-			const tagsArray = m.tags;
-			for (let i = 0; i < tagsArray.length; i++) {
-				let tag = tagsArray[i];
-				if (!tags.includes(tag)) {
-					tags.push(tag);
+		Object.keys(paths).forEach((url) => {
+			const methods = Object.keys(paths[url]);
+			methods.forEach((method) => {
+				const m = paths[url][method];
+				const tagsArray = m.tags;
+				for (let i = 0; i < tagsArray.length; i++) {
+					let tag = tagsArray[i];
+					if (!tags.includes(tag)) {
+						tags.push(tag);
+					}
+					if (endpoints.has(tag)) {
+						let tempEndpoints: EndpointMethod[] = [];
+						tempEndpoints = endpoints.get(tag) || [];
+						tempEndpoints?.push(createEndpointMethod(url, method, tag, m));
+						endpoints.set(tag, tempEndpoints);
+					} else {
+						let tempEndpoints: EndpointMethod[] = [];
+						tempEndpoints.push(createEndpointMethod(url, method, tag, m));
+						endpoints.set(tag, tempEndpoints);
+					}
 				}
-				if (endpoints.has(tag)) {
-					let tempEndpoints: EndpointMethod[] = [];
-					tempEndpoints = endpoints.get(tag) || [];
-					tempEndpoints?.push(createEndpointMethod(url, method, tag, m));
-					endpoints.set(tag, tempEndpoints);
-				} else {
-					let tempEndpoints: EndpointMethod[] = [];
-					tempEndpoints.push(createEndpointMethod(url, method, tag, m));
-					endpoints.set(tag, tempEndpoints);
-				}
-			}
+			});
 		});
-	});
 
-	tags.forEach((tag) => {
-		const apiCategory: ApiCategory = new ApiCategory(tag, vscode.TreeItemCollapsibleState.Collapsed);
-		apiCategories.push(apiCategory);
-	});
+		tags.forEach((tag) => {
+			const apiCategory: ApiCategory = new ApiCategory(tag, vscode.TreeItemCollapsibleState.Collapsed);
+			apiCategories.push(apiCategory);
+		});
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
 
 	return apiCategories;
 }
@@ -169,15 +176,16 @@ function generateApiEndpointTreeItems(tag: string): EndpointTreeItem[] {
 
 /**
  * Generates all available API categories from API specification
+ * @returns Array of `ApiCategoryQuickPickItem`
  */
 export function generateApiCategoryQuickPickItems(): ApiCategoryQuickPickItem[] {
 	let quickPickItems: ApiCategoryQuickPickItem[] = [];
 	try {
-		console.log(`generateApiCategoryQuickPickItems --> ${generateApiCategories().length}`);
+		// console.log(`generateApiCategoryQuickPickItems --> ${generateApiCategories().length}`);
 		const apiCategories: ApiCategory[] = generateApiCategories();
 
 		apiCategories.forEach((apiCategory) => {
-			const qpItem: ApiCategoryQuickPickItem = new ApiCategoryQuickPickItem(apiCategory.label, apiCategory.label, apiCategory.label);
+			const qpItem: ApiCategoryQuickPickItem = new ApiCategoryQuickPickItem(apiCategory.label, ``, ``);
 			quickPickItems.push(qpItem);
 		});
 	} catch (err) {
@@ -189,7 +197,8 @@ export function generateApiCategoryQuickPickItems(): ApiCategoryQuickPickItem[] 
 
 /**
  * Generates API endpoints for provided API category
- * @param apiCategory API category to fetch API endpoints for
+ * @param apiCategory API category to fetch API endpoints for.
+ * @returns Array of `EndpointQuickPickItem`
  */
 export function generateApiEndpointQuickPickItems(apiCategory: string): EndpointQuickPickItem[] {
 	let quickPickItems: EndpointQuickPickItem[] = [];
@@ -249,4 +258,25 @@ export function getAddressValidationEndpoint(): EndpointMethod | undefined {
 	}
 
 	return addressValidationEndpoint;
+}
+
+export function getTestConnectionEndpoint(): EndpointMethod | undefined {
+	let testConnectionEndpoint: EndpointMethod | undefined;
+
+	const paths: any = swaggerJson.paths;
+
+	try {
+		Object.keys(paths).forEach((url) => {
+			if (url === `/api/v2/utilities/ping`) {
+				const method = 'get';
+				const methodObj = paths[url][method];
+				testConnectionEndpoint = createEndpointMethod(url, method, 'Utilities', methodObj);
+			}
+		});
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+
+	return testConnectionEndpoint;
 }

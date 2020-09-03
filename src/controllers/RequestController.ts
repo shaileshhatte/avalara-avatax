@@ -28,22 +28,3 @@ export async function makeRequest(data: any) {
 		vscode.window.showErrorMessage(`Missing request content.`);
 	}
 }
-
-export async function testConnection(accountId?: string, avataxKey?: string) {
-	try {
-		const data: any = {
-			url: testConnectionUrl,
-			accountNumber: accountId,
-			licenseKey: avataxKey
-		};
-		const axiosConfig = await createAxiosConfig(data);
-		if (axiosConfig) {
-			sendRequest(axiosConfig);
-		} else {
-			throw new Error(`Problems constructing the request.`);
-		}
-	} catch (err) {
-		vscode.window.showErrorMessage(err);
-		console.error(err);
-	}
-}

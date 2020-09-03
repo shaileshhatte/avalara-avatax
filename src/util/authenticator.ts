@@ -2,8 +2,7 @@ import { window } from 'vscode';
 import { updateATConfiguration, getATConfiguration } from './configurationProvider';
 import * as keytar from 'keytar';
 import { error } from 'console';
-import { testConnection } from '../controllers/RequestController';
-// import { testConnectionToAvatax } from '../service/requestor';
+import { launchTestConnectionEndpoint } from '../helpers/requestLauncher';
 
 const keytarServiceName: string = `avalara.vscode.ext`;
 const avataxAccountNumberConfigName = `avataxaccountnumber`;
@@ -37,7 +36,8 @@ export async function setupAvataxCredentials() {
 					id: `yes`
 				});
 				if (res?.id === `yes`) {
-					await testConnection(enteredAccountId, avataxKey);
+					await launchTestConnectionEndpoint();
+					await window.showInformationMessage(`Click 'Send Request' to test connection to AvaTax.`);
 				}
 			}
 

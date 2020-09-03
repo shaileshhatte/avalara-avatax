@@ -11,7 +11,8 @@ import {
 	generateApiCategoryQuickPickItems,
 	generateApiEndpointQuickPickItems,
 	getTaxCalculationEndpoint,
-	getAddressValidationEndpoint
+	getAddressValidationEndpoint,
+	getTestConnectionEndpoint
 } from '../providers/endpointsProvider';
 
 /**
@@ -59,6 +60,19 @@ export function launchAddressCalculationEndpoint() {
 		addressValidationEndpoint = getAddressValidationEndpoint();
 		if (addressValidationEndpoint) {
 			launchEndpointView(addressValidationEndpoint);
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
+}
+
+export function launchTestConnectionEndpoint() {
+	let testConnectionEndpoint: EndpointMethod | undefined;
+	try {
+		testConnectionEndpoint = getTestConnectionEndpoint();
+		if (testConnectionEndpoint) {
+			launchEndpointView(testConnectionEndpoint);
 		}
 	} catch (err) {
 		console.error(err);
