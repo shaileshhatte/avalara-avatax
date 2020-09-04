@@ -1,4 +1,5 @@
 import * as swaggerJson from '../data/swagger.json';
+import { window } from 'vscode';
 
 const definitions: any = swaggerJson.definitions;
 
@@ -17,64 +18,68 @@ export function convertSchemaToJson(model: string, generateFullModel?: boolean, 
 
 	let jsonObject: any = {};
 
-	if (!!schemaModel.example && !generateFullModel) {
-		return schemaModel.example;
-	}
+	try {
+		if (!!schemaModel.example && !generateFullModel) {
+			return schemaModel.example;
+		}
 
-	const propertiesObject: any = schemaModel.properties || null;
-	if (propertiesObject !== null) {
-		const props: string[] = Object.keys(propertiesObject);
-		props.forEach((propKey) => {
-			// console.log(`prop ${prop}`);
-			const propObject: any = propertiesObject[propKey];
+		const propertiesObject: any = schemaModel.properties || null;
+		if (propertiesObject !== null) {
+			const props: string[] = Object.keys(propertiesObject);
+			props.forEach((propKey) => {
+				const propObject: any = propertiesObject[propKey];
 
-			if (!!propObject.example) {
-				jsonObject[propKey] = propObject.example;
-			} else if (!!propObject.type) {
-				switch (propObject.type) {
-					case 'string':
-						if (!!propObject.enum) {
-							let possibleValues = propObject.enum;
-							jsonObject[propKey] = possibleValues[getRandomArbitrary(0, possibleValues.length)];
-						}
-						jsonObject[propKey] = generateRandomString(15);
-						break;
+				if (!!propObject.example) {
+					jsonObject[propKey] = propObject.example;
+				} else if (!!propObject.type) {
+					switch (propObject.type) {
+						case 'string':
+							if (!!propObject.enum) {
+								let possibleValues = propObject.enum;
+								jsonObject[propKey] = possibleValues[getRandomArbitrary(0, possibleValues.length)];
+							}
+							jsonObject[propKey] = generateRandomString(15);
+							break;
 
-					case 'number':
-						jsonObject[propKey] = getRandomArbitrary(1, 10);
-						break;
+						case 'number':
+							jsonObject[propKey] = getRandomArbitrary(1, 10);
+							break;
 
-					case 'array':
-						let refArr = propObject.items['$ref'].split('/');
-						let innerModel = refArr[refArr.length - 1];
-						let items: any[] = [];
-						items.push(convertSchemaToJson(innerModel), generateFullModel);
-						jsonObject[propKey] = items;
-						break;
+						case 'array':
+							let refArr = propObject.items['$ref'].split('/');
+							let innerModel = refArr[refArr.length - 1];
+							let items: any[] = [];
+							items.push(convertSchemaToJson(innerModel), generateFullModel);
+							jsonObject[propKey] = items;
+							break;
 
-					case 'boolean':
-						jsonObject[propKey] = false;
-						break;
+						case 'boolean':
+							jsonObject[propKey] = false;
+							break;
 
-					case 'null':
-						jsonObject[propKey] = null;
-						break;
+						case 'null':
+							jsonObject[propKey] = null;
+							break;
 
-					case 'object':
-						jsonObject[propKey] = {};
-						break;
+						case 'object':
+							jsonObject[propKey] = {};
+							break;
 
-					default:
-						jsonObject[propKey] = {};
-						break;
+						default:
+							jsonObject[propKey] = {};
+							break;
+					}
+				} else if (!!propObject['$ref']) {
+					let refArr = propObject['$ref'].split('/');
+					let innerModel = refArr[refArr.length - 1];
+
+					jsonObject[propKey] = convertSchemaToJson(innerModel, generateFullModel);
 				}
-			} else if (!!propObject['$ref']) {
-				let refArr = propObject['$ref'].split('/');
-				let innerModel = refArr[refArr.length - 1];
-
-				jsonObject[propKey] = convertSchemaToJson(innerModel, generateFullModel);
-			}
-		});
+			});
+		}
+	} catch (err) {
+		console.error(err);
+		window.showErrorMessage(err);
 	}
 
 	return jsonObject;

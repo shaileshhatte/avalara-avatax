@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
 import { sendRequest } from '../service/requestor';
 import { createAxiosConfig } from '../service/requestFactory';
-
-const testConnectionUrl: string = `/api/v2/utilities/ping`;
+/** Local constants */
+const MISSING_CONTENT: string = `Missing request content.`;
+const PROBLEM_CONTRUCTING_REQUEST: string = `Problem constructing the request.`;
+const INVALID_REQ_BODY: string = 'Invalid Request Body.';
 
 /**
  * Hands over valid data to service caller to make a service call
  * @param data Request data including model
  */
-export async function makeRequest(data: any) {
+export async function makeRequest(data: any): Promise<void> {
 	if (data) {
 		try {
 			if (data.reqbody && data.reqbody !== 'NA') {
@@ -18,13 +20,13 @@ export async function makeRequest(data: any) {
 			if (axiosConfig) {
 				sendRequest(axiosConfig);
 			} else {
-				throw new Error(`Problems constructing the request.`);
+				throw new Error(PROBLEM_CONTRUCTING_REQUEST);
 			}
 		} catch (err) {
-			vscode.window.showErrorMessage('Invalid Request Body.');
+			vscode.window.showErrorMessage(INVALID_REQ_BODY);
 			console.error(err);
 		}
 	} else {
-		vscode.window.showErrorMessage(`Missing request content.`);
+		vscode.window.showErrorMessage(MISSING_CONTENT);
 	}
 }

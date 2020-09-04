@@ -5,16 +5,12 @@
 
 	let descShowLink = document.getElementById('description-show-link');
 	if (descShowLink) {
-		console.log('Inside 1');
 		descShowLink.addEventListener('click', function (e) {
-			console.log('Inside 2');
 			let descriptionDiv = document.getElementById('description-div');
 			if (descriptionDiv && descriptionDiv.style.display !== 'none') {
-				console.log('Inside 3');
 				descriptionDiv.style.display = 'none';
 				e.target.innerHTML = 'Show Description';
 			} else {
-				console.log('Inside 4');
 				descriptionDiv.style.display = 'inherit';
 				e.target.innerHTML = 'Hide';
 			}
@@ -26,7 +22,6 @@
 	let modelLink = document.getElementById('model-link');
 	if (modelLink) {
 		modelLink.addEventListener('click', function (e) {
-			console.log(e.target.innerHTML || '');
 			const modelName = e.target.innerHTML || '';
 			vscode.postMessage({
 				action: 'launchmodel',
@@ -43,7 +38,6 @@
 	// Send button click handler
 	btnSend.addEventListener('click', (e) => {
 		// Check all mandatory fields are filled in
-
 		let requiredInputFields = document.getElementsByClassName('input-true');
 		for (let i = 0; i < requiredInputFields.length; i++) {
 			let ipField = requiredInputFields[i];
@@ -114,8 +108,6 @@
 			if (paramValue === '') {
 				continue;
 			}
-			// ho[paramName] = paramValue;
-			// queryValues.push(ho);
 			queryValues[paramName] = paramValue;
 		}
 

@@ -6,6 +6,10 @@ import { launchModel } from './util/requestPanelClient';
 import { AvaWebView } from './util/basewebview';
 import { setupAvataxCredentials, deleteCredentials } from './util/authenticator';
 
+/**
+ * A function that's invoked when the extension is activated.
+ * @param context VS Code extension context
+ */
 export function activate(context: vscode.ExtensionContext) {
 	// API Endpoints provider
 	const endPointsProvider = new EndPointsProvider();
@@ -21,17 +25,18 @@ export function activate(context: vscode.ExtensionContext) {
 		treeDataProvider: definitionsProvider
 	});
 
+	// Share the Extension context so its accessible for using static resources
 	AvaWebView.extensionContext = context;
 
-	// Setup AvaTax credentials
+	// Command - Setup AvaTax credentials
 	const setupCredentialsDisposable = vscode.commands.registerCommand('avatax.setup', setupAvataxCredentials);
-	// Launch endpoint command
+	// Command - Launch endpoint command
 	const epLaunchDisposable = vscode.commands.registerCommand('endpoint.launch', launchEndpoint);
 	const modelLaunchDisposable = vscode.commands.registerCommand('model.launch', launchModel);
 
-	// Launch tax calculation command
+	// Command - tax calculation
 	const epTaxLaunchDisposable = vscode.commands.registerCommand('taxendpoint.launch', launchTaxCalculationEndpoint);
-	// Launch address validation command
+	// Command - Launch address validation
 	const epAddressLaunchDisposable = vscode.commands.registerCommand('addressendpoint.launch', launchAddressCalculationEndpoint);
 
 	context.subscriptions.push(

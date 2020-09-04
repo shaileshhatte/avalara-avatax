@@ -2,13 +2,15 @@ import * as vscode from 'vscode';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AvaWebView } from './basewebview';
 import * as nonceutil from '../util/nonceutil';
-
 const HTTPSnippet = require('httpsnippet');
 
 import * as LANGUAGE_ITEMS from '../data/snippetLanguages.json';
 
 let svcResult: AxiosResponse;
 
+/**
+ * Class that provides for language item template
+ */
 class LanguageQuickPickItem implements vscode.QuickPickItem {
 	label: string;
 	description?: string | undefined;
@@ -47,66 +49,60 @@ function getLanugageQuickPickItems(): LanguageQuickPickItem[] {
 	return quickPickItems;
 }
 
-export function genSnippet(res: AxiosResponse) {
-	console.log('entered');
+/**
+ * Generates code snippet for a given response
+ * @param res Service response
+ */
+export async function genSnippet(res: AxiosResponse) {
 	svcResult = res;
-
 	try {
-		vscode.window
-			.showQuickPick(getLanugageQuickPickItems(), {
-				canPickMany: false,
-				matchOnDescription: true,
-				placeHolder: 'Choose a programming language for generating a code snippet'
-			})
-			.then(
-				(langItem) => {
-					const lang: string = langItem?.code || '';
+		const langItemSelected = await vscode.window.showQuickPick(getLanugageQuickPickItems(), {
+			canPickMany: false,
+			matchOnDescription: true,
+			placeHolder: 'Choose a programming language for generating the snippet'
+		});
 
-					console.log(langItem?.libraries);
+		if (langItemSelected) {
+			const lang: string = langItemSelected?.code || '';
 
-					if (langItem?.libraries && langItem.libraries.length > 0) {
-						console.log(`if --> ${lang}`);
-						let libQuickPickItems: LanguageQuickPickItem[] = [];
-						langItem?.libraries.forEach((lib: any) => {
-							let libQuickPickItem: LanguageQuickPickItem = new LanguageQuickPickItem(
-								lib.code,
-								lib.label,
-								lib.description,
-								lib.detail,
-								[]
-							);
+			if (langItemSelected.libraries && langItemSelected.libraries.length > 0) {
+				let libQuickPickItems: LanguageQuickPickItem[] = [];
+				langItemSelected.libraries.forEach((lib: any) => {
+					let libQuickPickItem: LanguageQuickPickItem = new LanguageQuickPickItem(
+						lib.code,
+						lib.label,
+						lib.description,
+						lib.detail,
+						[]
+					);
 
-							libQuickPickItems.push(libQuickPickItem);
-						});
+					libQuickPickItems.push(libQuickPickItem);
+				});
 
-						vscode.window
-							.showQuickPick(libQuickPickItems, {
-								canPickMany: false,
-								matchOnDescription: true,
-								placeHolder: 'Choose a client/library to use'
-							})
-							.then(
-								(lib) => {
-									constructSnippet(lang, lib?.code || '');
-								},
-								(err) => {
-									vscode.window.showErrorMessage(err);
-								}
-							);
-					} else {
-						constructSnippet(lang, '');
-					}
-				},
-				(err) => {
-					console.error(err);
-					vscode.window.showErrorMessage(err);
+				const libSelected = await vscode.window.showQuickPick(libQuickPickItems, {
+					canPickMany: false,
+					matchOnDescription: true,
+					placeHolder: 'Choose a client/library to use'
+				});
+
+				if (libSelected) {
+					constructSnippet(lang, libSelected.code || '');
 				}
-			);
+				libQuickPickItems = [];
+			} else {
+				constructSnippet(lang, '');
+			}
+		}
 	} catch (err) {
 		vscode.window.showErrorMessage(err);
 	}
 }
 
+/**
+ * Generates a code snippet for provide language using provided library
+ * @param lang Language to generate a snippet for
+ * @param library HTTP client/library to use to generate a snippet
+ */
 function constructSnippet(lang: string, library?: string): void {
 	try {
 		const requestConfig: AxiosRequestConfig = svcResult.config;
@@ -134,12 +130,10 @@ function constructSnippet(lang: string, library?: string): void {
 		let convertedSnippet: string = '';
 
 		if (library) {
-			console.log('if 1');
 			convertedSnippet = snippet.convert(lang.toLowerCase(), library, {
 				indent: '\t'
 			});
 		} else {
-			console.log('if 2');
 			convertedSnippet = snippet.convert(lang.toLowerCase(), {
 				indent: '\t'
 			});
@@ -160,10 +154,6 @@ function constructSnippet(lang: string, library?: string): void {
                             		<textarea class='monospace' readonly>${htmlContent}</textarea>
                             	</body>
                             </html>`;
-
-		// vscode.workspace.openTextDocument({
-		// 	content: convertedSnippet
-		// });
 	} catch (err) {
 		vscode.window.showErrorMessage(err);
 	}

@@ -1,6 +1,7 @@
 import { EndpointMethod } from '../models/EndpointMethod';
 import { Parameter } from '../models/Parameter';
 import * as requestJsonGenerator from './requestJsonGenerator';
+import { window } from 'vscode';
 
 let endpoint: EndpointMethod | undefined = undefined;
 
@@ -42,7 +43,9 @@ function generateTitleButtonsHtml(): string {
 
 	return htmlContent;
 }
-
+/**
+ * Generates an HTML for description of the endpoint
+ */
 function generateEndpointDescription(): string {
 	let htmlContent: string = '';
 
@@ -57,16 +60,6 @@ function generateEndpointDescription(): string {
 							</div>
 						</div>
 					`;
-
-	// htmlContent += `
-	// 					<tr class='heading'>
-	// 						<td colspan='2'><span class='bold-text'>DESCRIPTION</span></td>
-	// 					</tr>
-	// 					<tr class='endpoint-description'>
-	// 						<td colspan='2'>${endpoint?.description}</td>
-	// 					</tr>
-	// 				`;
-
 	return htmlContent;
 }
 
@@ -179,6 +172,7 @@ function getEditableParametersContent(editableParametersMap: Map<string, Paramet
 		});
 	} catch (err) {
 		console.error(err);
+		window.showErrorMessage(err);
 	}
 
 	return htmlContent;
@@ -208,6 +202,7 @@ function getRequestBodyHtml(model: string): string {
 					`;
 	} catch (err) {
 		console.error(err);
+		window.showErrorMessage(err);
 	}
 
 	return htmlContent;

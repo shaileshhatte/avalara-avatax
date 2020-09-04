@@ -1,5 +1,8 @@
 import { PropertyModel } from './PropertyModel';
 
+/**
+ * A class that provides for definition model template
+ */
 export class DefinitionModel {
 	constructor(
 		public readonly name: string,

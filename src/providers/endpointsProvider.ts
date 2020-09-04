@@ -6,7 +6,7 @@ let tags: string[] = [];
 let endpoints: Map<string, EndpointMethod[]> = new Map();
 
 /**
- * Endpoint item in the API endpoints treeview
+ * Class that facilitates endpoint items to show under the API endpoints treeview
  */
 class EndpointTreeItem extends vscode.TreeItem {
 	constructor(public readonly endpoint: EndpointMethod) {
@@ -19,6 +19,7 @@ class EndpointTreeItem extends vscode.TreeItem {
 		};
 	}
 
+	/** Tooltip to show when hovered over an endpoint */
 	get tooltip(): string {
 		let tooltip = `${this.endpoint.urlLabel}\n\nMethod: ${this.endpoint.method.toUpperCase()}\nOperation: ${
 			this.endpoint.operationId
@@ -26,11 +27,15 @@ class EndpointTreeItem extends vscode.TreeItem {
 		return tooltip;
 	}
 
+	/** Short description to show against the endpoint */
 	get description(): string {
 		return this.endpoint.method ? this.endpoint.method.toUpperCase() : '';
 	}
 }
 
+/**
+ * Class that provides tree item for API category under Endpoints treeview.
+ */
 class ApiCategory extends vscode.TreeItem {
 	constructor(public readonly label: string, public readonly collapsibleState: vscode.TreeItemCollapsibleState) {
 		super(label, collapsibleState);
@@ -55,7 +60,7 @@ export class EndPointsProvider implements vscode.TreeDataProvider<EndpointTreeIt
 }
 
 /**
- * A generic class to create quick pick item
+ * A generic class that creates quick pick item
  */
 export class EndpointQuickPickItem implements vscode.QuickPickItem {
 	label: string;
@@ -88,34 +93,36 @@ export class ApiCategoryQuickPickItem implements vscode.QuickPickItem {
 
 /**
  * Generates API categories from API specification file (Swagger.json)
+ * @returns Array of `ApiCategory` items
  */
 function generateApiCategories(): ApiCategory[] {
 	const apiCategories: ApiCategory[] = [];
+	endpoints = new Map();
 
 	try {
 		const paths: any = swaggerJson.paths;
-
 		Object.keys(paths).forEach((url) => {
 			const methods = Object.keys(paths[url]);
 			methods.forEach((method) => {
-				const m = paths[url][method];
-				const tagsArray = m.tags;
-				for (let i = 0; i < tagsArray.length; i++) {
-					let tag = tagsArray[i];
+				const methodObj = paths[url][method];
+				const tagsArray = methodObj.tags;
+				// Iterate over tags and add a tag to tags list if doesn't exist.
+				// Also, if the tag already exists, add the endpoints against it.
+				tagsArray.forEach((tag: string) => {
 					if (!tags.includes(tag)) {
 						tags.push(tag);
 					}
+
+					let tempEndpoints: EndpointMethod[] = [];
 					if (endpoints.has(tag)) {
-						let tempEndpoints: EndpointMethod[] = [];
 						tempEndpoints = endpoints.get(tag) || [];
-						tempEndpoints?.push(createEndpointMethod(url, method, tag, m));
+						tempEndpoints?.push(createEndpointMethod(url, method, tag, methodObj));
 						endpoints.set(tag, tempEndpoints);
 					} else {
-						let tempEndpoints: EndpointMethod[] = [];
-						tempEndpoints.push(createEndpointMethod(url, method, tag, m));
+						tempEndpoints.push(createEndpointMethod(url, method, tag, methodObj));
 						endpoints.set(tag, tempEndpoints);
 					}
-				}
+				});
 			});
 		});
 
@@ -137,6 +144,7 @@ function generateApiCategories(): ApiCategory[] {
  * @param method Method (e.g. GET, POST) of the endpoint
  * @param tag API category this endpoint belongs to
  * @param ep Endpoint object from the API specification file (Swagger.json)
+ * @returns `EndpointMethod` object
  */
 function createEndpointMethod(url: string, method: string, tag: string, ep: any): EndpointMethod {
 	return new EndpointMethod(
@@ -157,6 +165,7 @@ function createEndpointMethod(url: string, method: string, tag: string, ep: any)
 /**
  * Generates API endpoints for a given API category
  * @param tag An API category (e.g. accounts, transactions etc.)
+ * @returns Array of `EndpointTreeItem` items
  */
 function generateApiEndpointTreeItems(tag: string): EndpointTreeItem[] {
 	const endpointMethods: EndpointMethod[] = endpoints.get(tag) || [];
@@ -181,9 +190,7 @@ function generateApiEndpointTreeItems(tag: string): EndpointTreeItem[] {
 export function generateApiCategoryQuickPickItems(): ApiCategoryQuickPickItem[] {
 	let quickPickItems: ApiCategoryQuickPickItem[] = [];
 	try {
-		// console.log(`generateApiCategoryQuickPickItems --> ${generateApiCategories().length}`);
 		const apiCategories: ApiCategory[] = generateApiCategories();
-
 		apiCategories.forEach((apiCategory) => {
 			const qpItem: ApiCategoryQuickPickItem = new ApiCategoryQuickPickItem(apiCategory.label, ``, ``);
 			quickPickItems.push(qpItem);
@@ -203,7 +210,6 @@ export function generateApiCategoryQuickPickItems(): ApiCategoryQuickPickItem[] 
 export function generateApiEndpointQuickPickItems(apiCategory: string): EndpointQuickPickItem[] {
 	let quickPickItems: EndpointQuickPickItem[] = [];
 	try {
-		console.log(`generateApiEndpointsQuickPickItems --> ${generateApiEndpointTreeItems(apiCategory).length}`);
 		const apiEndpoints: EndpointTreeItem[] = generateApiEndpointTreeItems(apiCategory);
 		apiEndpoints.forEach((ep) => {
 			const qpItem: EndpointQuickPickItem = new EndpointQuickPickItem(
@@ -221,10 +227,14 @@ export function generateApiEndpointQuickPickItems(apiCategory: string): Endpoint
 	return quickPickItems;
 }
 
+/**
+ * Provides an endpoint for tax calculation cammand
+ * @returns `EndpointMethod` object or `undefined`
+ */
 export function getTaxCalculationEndpoint(): EndpointMethod | undefined {
 	let taxCalcEndpoint: EndpointMethod | undefined;
-	const paths: any = swaggerJson.paths;
 	try {
+		const paths: any = swaggerJson.paths;
 		Object.keys(paths).forEach((url) => {
 			if (url === `/api/v2/transactions/create`) {
 				const method = 'post';
@@ -239,12 +249,14 @@ export function getTaxCalculationEndpoint(): EndpointMethod | undefined {
 	return taxCalcEndpoint;
 }
 
+/**
+ * Provides an endpoint for address validation command
+ * @returns `EndpointMethod` object or `undefined`
+ */
 export function getAddressValidationEndpoint(): EndpointMethod | undefined {
 	let addressValidationEndpoint: EndpointMethod | undefined;
-
-	const paths: any = swaggerJson.paths;
-
 	try {
+		const paths: any = swaggerJson.paths;
 		Object.keys(paths).forEach((url) => {
 			if (url === `/api/v2/addresses/resolve`) {
 				const method = 'post';
@@ -256,16 +268,17 @@ export function getAddressValidationEndpoint(): EndpointMethod | undefined {
 		console.error(err);
 		vscode.window.showErrorMessage(err);
 	}
-
 	return addressValidationEndpoint;
 }
 
+/**
+ * Provides an endpoint for test connection command
+ * @returns `EndpointMethod` object or `undefined`
+ */
 export function getTestConnectionEndpoint(): EndpointMethod | undefined {
 	let testConnectionEndpoint: EndpointMethod | undefined;
-
-	const paths: any = swaggerJson.paths;
-
 	try {
+		const paths: any = swaggerJson.paths;
 		Object.keys(paths).forEach((url) => {
 			if (url === `/api/v2/utilities/ping`) {
 				const method = 'get';

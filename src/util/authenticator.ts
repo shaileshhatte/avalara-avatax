@@ -1,15 +1,16 @@
 import { window } from 'vscode';
 import { updateATConfiguration, getATConfiguration } from './configurationProvider';
 import * as keytar from 'keytar';
-import { error } from 'console';
 import { launchTestConnectionEndpoint } from '../helpers/requestLauncher';
+import { AVConstants } from './avconstants';
 
-const keytarServiceName: string = `avalara.vscode.ext`;
-const avataxAccountNumberConfigName = `avataxaccountnumber`;
-
+/**
+ * Sets up AvaTax credentials via command.
+ * Replaces the existing account with the newly entered details.
+ */
 export async function setupAvataxCredentials() {
 	try {
-		const storedAccountId = getATConfiguration(avataxAccountNumberConfigName) || ``;
+		const storedAccountId = getATConfiguration(AVConstants.avataxAccountNumberConfigName) || ``;
 		let avataxKey: string | undefined;
 		const enteredAccountId = await window.showInputBox({
 			value: (storedAccountId as string) || '',
@@ -28,7 +29,7 @@ export async function setupAvataxCredentials() {
 
 			if (avataxKey) {
 				await setCredentials(enteredAccountId, avataxKey);
-				await updateATConfiguration(avataxAccountNumberConfigName, enteredAccountId); // Update account number in extension settings with the new one
+				await updateATConfiguration(AVConstants.avataxAccountNumberConfigName, enteredAccountId); // Update account number in extension settings with the new one
 
 				// Popup with an option to test connection
 				const res = await window.showInformationMessage(`AvaTax credentials stored successfully!`, {
@@ -60,7 +61,7 @@ export async function setupAvataxCredentials() {
  */
 async function setCredentials(accountid: string, key: string): Promise<void> {
 	try {
-		return await keytar.setPassword(keytarServiceName, accountid, key);
+		return await keytar.setPassword(AVConstants.keytarServiceName, accountid, key);
 	} catch (err) {
 		console.error(err);
 		window.showErrorMessage(`Credentials could not be stored in the system.`);
@@ -74,7 +75,7 @@ async function setCredentials(accountid: string, key: string): Promise<void> {
 export async function getCredentials(accountid: string): Promise<string | null> {
 	let storedAvataxKey: string | null = null;
 	try {
-		storedAvataxKey = await keytar.getPassword(keytarServiceName, accountid);
+		storedAvataxKey = await keytar.getPassword(AVConstants.keytarServiceName, accountid);
 		if (!storedAvataxKey) {
 			return Promise.reject(`AvaTax credentials may not be set up.`);
 		}
@@ -96,11 +97,11 @@ export async function deleteCredentials(accountId?: string) {
 	if (accountId) {
 		accountToRemove = accountId;
 	} else {
-		accountToRemove = getATConfiguration(avataxAccountNumberConfigName);
+		accountToRemove = getATConfiguration(AVConstants.avataxAccountNumberConfigName);
 	}
 	try {
 		if (accountToRemove) {
-			deletePromise = await keytar.deletePassword(keytarServiceName, accountToRemove as string);
+			deletePromise = await keytar.deletePassword(AVConstants.keytarServiceName, accountToRemove as string);
 		}
 	} catch (err) {
 		console.error(err);

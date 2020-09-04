@@ -1,3 +1,6 @@
+/**
+ * A class that provides for property template
+ */
 export class PropertyModel {
 	constructor(
 		public readonly name: string,

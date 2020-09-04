@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { getCredentials } from './authenticator';
+import { AVConstants } from './avconstants';
 
-const configurationSectionName: string = 'avalara';
+const configurationSectionName: string = AVConstants.configurationSectionName;
 
 /**
  * Retrieves the configuration value of given configuration property.

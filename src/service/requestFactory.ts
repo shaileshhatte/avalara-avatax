@@ -2,11 +2,8 @@ import * as axiosModule from 'axios';
 import { getATConfiguration, getATLicenseKey } from '../util/configurationProvider';
 import { Base64 } from 'js-base64';
 import { window } from 'vscode';
+import { AVConstants } from '../util/avconstants';
 
-// AvaTax config constants
-const avataxAccountNumberConfigName: string = `avataxaccountnumber`;
-const environmentConfigName: string = `environment`;
-const requestTimeOutConfigName: string = `requesttimeout`;
 // Request Config constants
 let ACCOUNT_NUMBER: string = '';
 let LICENSE_KEY: string = '';
@@ -14,12 +11,12 @@ let ENV_TYPE: string = '';
 let REQUEST_TIMEOUT: number = 0;
 let BASE_URL: string = '';
 
-const SANDBOX_BASE_URL: string = `https://sandbox-rest.avatax.com`;
-const PRODUCTION_BASE_URL: string = `https://rest.avatax.com`;
-
 // local constants
 let endpointUrl: string = '';
 
+/**
+ * Class that templates AxiosRequestConfig for generating request config
+ */
 class AxiosConfiguration implements axiosModule.AxiosRequestConfig {
 	url: string;
 	baseURL: string = BASE_URL;
@@ -64,6 +61,10 @@ class AxiosConfiguration implements axiosModule.AxiosRequestConfig {
 	}
 }
 
+/**
+ * Generates header values for request config
+ * @param headerValues Header values object received from the front end
+ */
 function getHeaders(headerValues: any): any {
 	let headerObject: any = {};
 	if (headerValues) {
@@ -73,6 +74,10 @@ function getHeaders(headerValues: any): any {
 	return headerObject;
 }
 
+/**
+ * Generates endpoint url from the data
+ * @param data Request data
+ */
 function generateEndpointUrl(data: any): string {
 	endpointUrl = data.url || ``;
 	let pathParams: [] = data.parameters?.pathvalues || [];
@@ -100,6 +105,10 @@ function generateEndpointUrl(data: any): string {
 	return endpointUrl;
 }
 
+/**
+ * Creates axios request configuration
+ * @param data Request data
+ */
 export async function createAxiosConfig(data: any): Promise<AxiosConfiguration | undefined> {
 	let requestConfiguration: AxiosConfiguration | undefined;
 	try {
@@ -114,13 +123,16 @@ export async function createAxiosConfig(data: any): Promise<AxiosConfiguration |
 	return requestConfiguration;
 }
 
+/**
+ * Sets AvaTax configuration values
+ */
 async function setATSettings() {
 	try {
-		ACCOUNT_NUMBER = (getATConfiguration(avataxAccountNumberConfigName) as string) || ``;
+		ACCOUNT_NUMBER = (getATConfiguration(AVConstants.avataxAccountNumberConfigName) as string) || ``;
 		LICENSE_KEY = (await getATLicenseKey(ACCOUNT_NUMBER)) || ``;
-		ENV_TYPE = (getATConfiguration(environmentConfigName) as string) || ``;
-		REQUEST_TIMEOUT = (getATConfiguration(requestTimeOutConfigName) as number) || 0;
-		BASE_URL = ENV_TYPE === 'Sandbox' ? SANDBOX_BASE_URL : PRODUCTION_BASE_URL;
+		ENV_TYPE = (getATConfiguration(AVConstants.environmentConfigName) as string) || ``;
+		REQUEST_TIMEOUT = (getATConfiguration(AVConstants.requestTimeOutConfigName) as number) || 0;
+		BASE_URL = ENV_TYPE === 'Sandbox' ? AVConstants.sandboxBaseUrl : AVConstants.productionBaseUrl;
 	} catch (err) {
 		console.error(err);
 		window.showErrorMessage(err);

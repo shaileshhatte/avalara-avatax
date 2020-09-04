@@ -1,12 +1,10 @@
 // VSCode imports
 import * as vscode from 'vscode';
-// script imports
 import { AvaWebView } from '../util/basewebview';
 import { EndpointMethod } from '../models/EndpointMethod';
 import * as requestGenerator from './requestGenerator';
 import * as requestWebviewClient from '../util/requestPanelClient';
 import * as nonceutil from '../util/nonceutil';
-
 import {
 	generateApiCategoryQuickPickItems,
 	generateApiEndpointQuickPickItems,
@@ -14,6 +12,10 @@ import {
 	getAddressValidationEndpoint,
 	getTestConnectionEndpoint
 } from '../providers/endpointsProvider';
+
+/** Local Constants */
+const SOMETHING_WENT_WRONG: string = `Something went wrong.`;
+const CHOOSE_ENDPOINT: string = `Choose an API endpoint to launch`;
 
 /**
  * Launches a request webviewpanel for an endpoint
@@ -27,8 +29,8 @@ export function launchEndpoint(): void {
 		if (arguments[0]) {
 			endpoint = arguments[0];
 			if (!endpoint) {
-				console.log(`Couldn't assign endpoint.`);
-				vscode.window.showErrorMessage(`Something went wrong. Couldn't assign endpoint.`);
+				console.log(SOMETHING_WENT_WRONG);
+				vscode.window.showErrorMessage(SOMETHING_WENT_WRONG);
 				return;
 			}
 			launchEndpointView(endpoint);
@@ -41,6 +43,9 @@ export function launchEndpoint(): void {
 	}
 }
 
+/**
+ * Lancuhes a tax calculation endpoint
+ */
 export function launchTaxCalculationEndpoint() {
 	let taxCalculationEndpoint: EndpointMethod | undefined;
 	try {
@@ -54,6 +59,9 @@ export function launchTaxCalculationEndpoint() {
 	}
 }
 
+/**
+ * Launches an address validation endpoint
+ */
 export function launchAddressCalculationEndpoint() {
 	let addressValidationEndpoint: EndpointMethod | undefined;
 	try {
@@ -67,6 +75,9 @@ export function launchAddressCalculationEndpoint() {
 	}
 }
 
+/**
+ * Launches a test connection endpoint
+ */
 export function launchTestConnectionEndpoint() {
 	let testConnectionEndpoint: EndpointMethod | undefined;
 	try {
@@ -80,6 +91,10 @@ export function launchTestConnectionEndpoint() {
 	}
 }
 
+/**
+ * Launches a request viewpanel for the provided endpoint method.
+ * @param endpoint EndpointMethod to launch view for
+ */
 function launchEndpointView(endpoint: EndpointMethod) {
 	try {
 		if (endpoint) {
@@ -122,6 +137,9 @@ function generateRequestWebviewContent(endpoint: EndpointMethod): string {
 	return htmlContent;
 }
 
+/**
+ * Launches an endpoint via command
+ */
 async function launchEndpointViaCommand() {
 	try {
 		const pickedItem = await vscode.window.showQuickPick(generateApiCategoryQuickPickItems(), {
@@ -134,7 +152,7 @@ async function launchEndpointViaCommand() {
 			const epItem = await vscode.window.showQuickPick(generateApiEndpointQuickPickItems(pickedItem.label), {
 				matchOnDescription: true,
 				matchOnDetail: true,
-				placeHolder: `Choose an API endpoint to launch`
+				placeHolder: CHOOSE_ENDPOINT
 			});
 			if (epItem) {
 				if (epItem) {

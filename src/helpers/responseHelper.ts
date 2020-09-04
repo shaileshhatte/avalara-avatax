@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { AxiosResponse, AxiosError } from 'axios';
+import { writeFile } from 'fs';
 import { AvaWebView } from '../util/basewebview';
 import { getHeadTagContent, getScriptTagContent, responseBodyAsHtml } from '../util/responsePanelClient';
-import { writeFile } from 'fs';
 import { genSnippet } from '../util/httpSnippetsGenerator';
 
 let svcResult: AxiosResponse;
@@ -11,16 +11,15 @@ let contentDisposition: any = {
 	attachment: false,
 	filename: ''
 };
-let requestHeaders: any = {};
 
 /**
  * Processes the HTTP service response that's received.
  * @param result HTTP response received from the service
  */
-export function processResponse(result: AxiosResponse | AxiosError) {
+export async function processResponse(result: AxiosResponse | AxiosError) {
 	svcResult = (result as AxiosResponse) || (result as AxiosError).response;
 	if ((result as AxiosResponse).status >= 200 && (result as AxiosResponse).status <= 300) {
-		handleResponseSuccess(result as AxiosResponse);
+		await handleResponseSuccess(result as AxiosResponse);
 	} else {
 		handleResponseError(result as AxiosError);
 	}
@@ -30,34 +29,36 @@ export function processResponse(result: AxiosResponse | AxiosError) {
  * Handles success procedure.
  * @param result Success data from the HTTP response
  */
-function handleResponseSuccess(result: AxiosResponse) {
-	// console.log(result);
-	if (result.headers && result.headers['content-disposition']) {
-		// "attachment; filename=PointOfSale.2020-07-30.json; filename*=UTF-8''PointOfSale.2020-07-30.json"}
-		let dispositionString: string = result.headers['content-disposition'];
-		contentDisposition.attachment = !!dispositionString.split(';')[0];
-		contentDisposition.filename = dispositionString.split(';')[1].replace(`filename=`, ``).trim();
-		vscode.window
-			.showInformationMessage(
-				`Service is trying to provide the response data as attachment. What would you like to do?`,
+async function handleResponseSuccess(result: AxiosResponse): Promise<void> {
+	try {
+		if (result.headers && result.headers['content-disposition']) {
+			let dispositionString: string = result.headers['content-disposition'];
+			contentDisposition.attachment = !!dispositionString.split(';')[0];
+			contentDisposition.filename = dispositionString.split(';')[1].replace(`filename=`, ``).trim();
+			const val = await vscode.window.showInformationMessage(
+				`Service response is also available as an attachment.`,
 				{
 					title: `Download`
 				},
-				{ title: `Show inline` }
-			)
-			.then((val) => {
+				{ title: `Show Inline` }
+			);
+
+			if (val) {
 				switch (val?.title) {
 					case 'Download':
-						// console.log('Download');
 						saveResponseBody();
 						break;
 					default:
 						AvaWebView.getOrCreateResponseViewPanel().webview.html = generateResponseHtml(result);
 						break;
 				}
-			});
-	} else {
-		AvaWebView.getOrCreateResponseViewPanel().webview.html = generateResponseHtml(result);
+			}
+		} else {
+			AvaWebView.getOrCreateResponseViewPanel().webview.html = generateResponseHtml(result);
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
 	}
 }
 
@@ -70,7 +71,7 @@ function handleResponseError(error: AxiosError) {
 		AvaWebView.getOrCreateResponseViewPanel().webview.html = generateResponseHtml(error.response);
 	} else {
 		if (error.code && error.code === 'ENOTFOUND') {
-			vscode.window.showErrorMessage(`Please check your internet settings\n. ${error.name}: ${error.message}`);
+			vscode.window.showErrorMessage(`Please check your internet settings\n. ${error.message}`);
 			return;
 		}
 		vscode.window.showErrorMessage(`${error.name}: ${error.message}`);
@@ -116,41 +117,38 @@ function generateResponseHtml(result: AxiosResponse): string {
 function getResponseHeaderContent(result: AxiosResponse): string {
 	let htmlContent: string = '';
 
-	// console.log(result.config);
-	// console.log(result.request);
+	try {
+		const baseUrl: string = result.request.res.responseUrl || 'NA';
+		const responseStatus: string = `${result.status} ${result.statusText}`;
+		const headersObject = result.headers;
+		const rawHeaders = result.request ? result.request.res['rawHeaders'] : [];
 
-	const baseUrl: string = result.request.res.responseUrl || 'NA';
-	const responseStatus: string = `${result.status} ${result.statusText}`;
+		let requestHeadersHTML: string = '';
+		let requestHeaders: any = {};
 
-	const headersObject = result.headers;
-
-	const rawHeaders = result.request ? result.request.res['rawHeaders'] : [];
-
-	let requestHeadersHTML: string = '';
-
-	if (rawHeaders) {
-		for (let i = 0; i < rawHeaders.length; i++) {
-			if (i % 2 === 0) {
-				requestHeaders[rawHeaders[i].toString().trim()] = rawHeaders[i + 1].toString().trim() || '-';
+		if (rawHeaders) {
+			for (let i = 0; i < rawHeaders.length; i++) {
+				if (i % 2 === 0) {
+					requestHeaders[rawHeaders[i].toString().trim()] = rawHeaders[i + 1].toString().trim() || '-';
+				}
+				continue;
 			}
-			continue;
 		}
-	}
 
-	if (requestHeaders) {
-		requestHeadersHTML += ``;
-		Object.keys(requestHeaders).forEach((header) => {
-			requestHeadersHTML += `
+		if (requestHeaders) {
+			requestHeadersHTML += ``;
+			Object.keys(requestHeaders).forEach((header) => {
+				requestHeadersHTML += `
 									<p><span class='header-label'>${header}</span>: ${requestHeaders[header]}</p>
 									`;
-		});
-	}
+			});
+		}
 
-	const date: string = headersObject.date;
-	contentType = headersObject['content-type'];
-	const location: string = headersObject.location || '';
+		const date: string = headersObject.date;
+		contentType = headersObject['content-type'];
+		const location: string = headersObject.location || '';
 
-	htmlContent += `<table class='request-url-table'>
+		htmlContent += `<table class='request-url-table'>
 						<tr>
 							<td>
 								<span class='request-url-label'>Request URL:</span>
@@ -169,6 +167,10 @@ function getResponseHeaderContent(result: AxiosResponse): string {
 						${requestHeadersHTML}
 					</div>
 					`;
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
+	}
 	return htmlContent;
 }
 
@@ -176,57 +178,58 @@ function getResponseHeaderContent(result: AxiosResponse): string {
  * Handles command for copying response body
  */
 export function copyResponseBody() {
-	// const d = responseBody;
-	// console.log(`Inside copy \n${responseBody}`);
-	const clipboard: vscode.Clipboard = vscode.env.clipboard;
-	if (clipboard) {
-		clipboard.writeText(JSON.stringify(svcResult.data) || svcResult.statusText).then(() => {
-			vscode.window.showInformationMessage('Response copied to clipboard.');
-		});
-	} else {
-		vscode.window.showErrorMessage('Error: Clipboard may not be accessible.');
+	try {
+		const clipboard: vscode.Clipboard = vscode.env.clipboard;
+		if (clipboard) {
+			clipboard.writeText(JSON.stringify(svcResult.data) || svcResult.statusText).then(() => {
+				vscode.window.showInformationMessage('Response copied to clipboard.');
+			});
+		} else {
+			vscode.window.showErrorMessage('Error: Clipboard may not be accessible.');
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage(err);
 	}
 }
 
 /**
  * Handles action for saving response body based on its type
  */
-export function saveResponseBody() {
+export async function saveResponseBody() {
 	let filters: any = {};
-	let fullResponse: string = svcResult.data || svcResult.statusText;
-
-	const headersObject = svcResult.headers;
-	contentType = headersObject['content-type'];
-
-	let ext: string = '.json';
-	if (contentType.indexOf('json') >= 0) {
-		filters['JSON'] = [ext];
-		fullResponse = JSON.stringify(svcResult.data);
-	} else if (contentType.indexOf('xml') >= 0) {
-		ext = '.xml';
-		filters['XML'] = [ext];
-		fullResponse = svcResult.data.toString();
-	} else {
-		filters['HTML'] = ['.html', '.htm'];
-		filters['Text'] = ['.txt'];
-	}
-
-	const filename: string = contentDisposition.filename ? contentDisposition.filename : `untitled${ext}`;
-
 	try {
-		vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(filename) }).then((uri) => {
-			if (!uri) {
-				return;
-			}
+		let fullResponse: string = svcResult.data || svcResult.statusText;
+
+		const headersObject = svcResult.headers;
+		contentType = headersObject['content-type'];
+
+		let ext: string = '.json';
+		if (contentType.indexOf('json') >= 0) {
+			filters['JSON'] = [ext];
+			fullResponse = JSON.stringify(svcResult.data);
+		} else if (contentType.indexOf('xml') >= 0) {
+			ext = '.xml';
+			filters['XML'] = [ext];
+			fullResponse = svcResult.data.toString();
+		} else {
+			filters['HTML'] = ['.html', '.htm'];
+			filters['Text'] = ['.txt'];
+		}
+
+		const filename: string = contentDisposition.filename ? contentDisposition.filename : `untitled${ext}`;
+
+		const uri = await vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(filename) });
+		if (uri) {
 			const filePath = uri.fsPath;
-			writeFile(filePath, fullResponse, () => {
-				vscode.window.showInformationMessage(`File saved to: ${filePath}.`, { title: `Open` }).then((val) => {
-					if (val?.title === `Open`) {
-						vscode.workspace.openTextDocument(filePath).then(vscode.window.showTextDocument);
-					}
-				});
+			writeFile(filePath, fullResponse, async () => {
+				const val = await vscode.window.showInformationMessage(`File saved to: ${filePath}.`, { title: `Open` });
+				if (val?.title) {
+					const textDocument = await vscode.workspace.openTextDocument(filePath);
+					await vscode.window.showTextDocument(textDocument);
+				}
 			});
-		});
+		}
 	} catch (err) {
 		console.error(err);
 		vscode.window.showErrorMessage(err);
@@ -234,6 +237,5 @@ export function saveResponseBody() {
 }
 
 export function generateSnippet() {
-	//console.log(svcResult);
 	genSnippet(svcResult);
 }

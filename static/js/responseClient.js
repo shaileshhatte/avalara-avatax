@@ -1,6 +1,7 @@
 (function () {
 	const vscode = acquireVsCodeApi();
 
+	/** Copy button click handler */
 	const btnCopy = document.getElementById('btn-copy');
 	if (btnCopy) {
 		btnCopy.addEventListener('click', (e) => {
@@ -12,6 +13,7 @@
 		});
 	}
 
+	/** Save button click handler */
 	const btnSave = document.getElementById('btn-save');
 	if (btnSave) {
 		btnSave.addEventListener('click', (e) => {
@@ -22,6 +24,7 @@
 		});
 	}
 
+	/** Generate code snippet button click handler */
 	const btnGenerateSnippet = document.getElementById('btn-generate-code-snippet');
 	if (btnGenerateSnippet) {
 		btnGenerateSnippet.addEventListener('click', function (e) {

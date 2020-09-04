@@ -1,25 +1,26 @@
 import * as vscode from 'vscode';
 import { makeRequest } from '../controllers/RequestController';
-
 import { copyResponseBody, saveResponseBody, generateSnippet } from '../helpers/responseHelper';
 import { showRequiredFieldsError, launchModel } from '../util/requestPanelClient';
-
-const viewType: string = 'endpoint.launch';
+import { AVConstants } from './avconstants';
+/** Local constants */
+const viewType: string = AVConstants.endpointLaunchViewType;
+const responsePanelTitle: string = AVConstants.responsePanelTitle;
 
 /**
  * Class that caters to webviewpanel objects for request and response.
  * It also provides for disposing behavior and receives communications from webviewpanel HTML.
  */
 export class AvaWebView {
-	static reqPanel?: vscode.WebviewPanel; // Request webviewpanel for endpoint content
-	static resPanel?: vscode.WebviewPanel; // Response webviewpanel for response content
-	static modelPanel?: vscode.WebviewPanel; // Response webviewpanel for model content
+	static reqPanel?: vscode.WebviewPanel;
+	static resPanel?: vscode.WebviewPanel;
+	static modelPanel?: vscode.WebviewPanel;
 	static extensionContext: vscode.ExtensionContext;
 
 	/**
 	 * Returns a request webviewpanel instance. Creates one if one doesn't exist.
 	 * @param title Title which is shown on the request's webviewpanel
-	 * @returns {vscode.WebviewPanel} Request webviewpanel object
+	 * @returns `vscode.WebviewPanel` Request webviewpanel object
 	 */
 	public static getOrCreateRequestViewPanel = (title: string): vscode.WebviewPanel | undefined => {
 		try {
@@ -35,7 +36,6 @@ export class AvaWebView {
 				) {
 					if (!panel.visible) {
 						panel.reveal(columnToShowIn); // vscode.ViewColumn.One
-						//panel.webview.html = panel.webview.html;
 					}
 				} else {
 					panel.title = title;
@@ -44,7 +44,7 @@ export class AvaWebView {
 			}
 			// Check if the response panel exists. Create if doesn't exist.
 			if (!AvaWebView.resPanel) {
-				AvaWebView.resPanel = createWebView(`Response`);
+				AvaWebView.resPanel = createWebView(responsePanelTitle);
 				AvaWebView.resPanel.reveal(vscode.ViewColumn.Eight);
 			}
 			panel.reveal(vscode.ViewColumn.One);
@@ -62,13 +62,9 @@ export class AvaWebView {
 	public static getOrCreateResponseViewPanel(): vscode.WebviewPanel {
 		let panel: vscode.WebviewPanel | undefined = AvaWebView.resPanel;
 		if (panel) {
-			// AvaWebView.resPanel?.dispose();
-			// panel = createWebView('Response');
-
 			panel.reveal(vscode.ViewColumn.Eight);
-			//return panel;
 		} else {
-			panel = createWebView('Response');
+			panel = createWebView(responsePanelTitle);
 		}
 		return panel;
 	}
@@ -107,9 +103,7 @@ export class AvaWebView {
 	 */
 	public static createGenericViewPanel(title: string): vscode.WebviewPanel {
 		let panel: vscode.WebviewPanel | undefined;
-
 		const columnToShowIn = vscode.ViewColumn.One;
-
 		panel = vscode.window.createWebviewPanel(
 			viewType,
 			title,
@@ -123,7 +117,6 @@ export class AvaWebView {
 				enableFindWidget: true
 			}
 		);
-
 		return panel;
 	}
 }
@@ -141,21 +134,20 @@ const createWebView = (title: string): vscode.WebviewPanel => {
 		viewType,
 		title,
 		{
-			viewColumn: title === 'Response' ? vscode.ViewColumn.Eight : columnToShowIn,
+			viewColumn: title === responsePanelTitle ? vscode.ViewColumn.Eight : columnToShowIn,
 			preserveFocus: true
 		},
 		{
 			enableCommandUris: true,
 			enableScripts: true,
-			enableFindWidget: title === 'Response',
-			retainContextWhenHidden: title !== 'Response'
+			enableFindWidget: title === responsePanelTitle,
+			retainContextWhenHidden: title !== responsePanelTitle
 		}
 	);
-
 	// When the webviewpanels are disposed, mark corresponding objects undefined.
 	webViewPanel.onDidDispose(() => {
 		switch (title) {
-			case 'Response':
+			case responsePanelTitle:
 				AvaWebView.resPanel = undefined;
 				break;
 
@@ -191,10 +183,9 @@ const createWebView = (title: string): vscode.WebviewPanel => {
 					break;
 			}
 		}
-		// vscode.window.showInformationMessage(message.text);
 	});
 
-	if (title === 'Response') {
+	if (title === responsePanelTitle) {
 		AvaWebView.resPanel = webViewPanel;
 	} else {
 		AvaWebView.reqPanel = webViewPanel;

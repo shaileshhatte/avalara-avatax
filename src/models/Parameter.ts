@@ -1,3 +1,6 @@
+/**
+ * A class that provides for request parameter template
+ */
 export class Parameter {
 	constructor(
 		public name: string,

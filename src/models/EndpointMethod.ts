@@ -1,5 +1,8 @@
 import { Parameter } from './Parameter';
 
+/**
+ * A class that provides for endpoint item template.
+ */
 export class EndpointMethod {
 	constructor(
 		public readonly urlLabel: string,
