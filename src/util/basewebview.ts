@@ -3,6 +3,7 @@ import { makeRequest } from '../controllers/RequestController';
 import { copyResponseBody, saveResponseBody, generateSnippet } from '../helpers/responseHelper';
 import { showRequiredFieldsError, launchModel } from '../util/requestPanelClient';
 import { AVConstants } from './avconstants';
+
 /** Local constants */
 const viewType: string = AVConstants.endpointLaunchViewType;
 const responsePanelTitle: string = AVConstants.responsePanelTitle;
@@ -20,7 +21,7 @@ export class AvaWebView {
 	/**
 	 * Returns a request webviewpanel instance. Creates one if one doesn't exist.
 	 * @param title Title which is shown on the request's webviewpanel
-	 * @returns `vscode.WebviewPanel` Request webviewpanel object
+	 * @returns  Request webviewpanel object of type `vscode.WebviewPanel`
 	 */
 	public static getOrCreateRequestViewPanel = (title: string): vscode.WebviewPanel | undefined => {
 		try {

@@ -5,6 +5,8 @@ import * as nonceutil from '../util/nonceutil';
 const HTTPSnippet = require('httpsnippet');
 
 import * as LANGUAGE_ITEMS from '../data/snippetLanguages.json';
+import { writeFile } from 'fs';
+import path = require('path');
 
 let svcResult: AxiosResponse;
 
@@ -16,11 +18,13 @@ class LanguageQuickPickItem implements vscode.QuickPickItem {
 	description?: string | undefined;
 	detail?: string | undefined;
 	code: string;
+	fileExtension: string;
 	libraries: any[];
 
-	constructor(code: string, label: string, description?: string, detail?: string, libraries?: any[]) {
+	constructor(code: string, label: string, fileExtension: string, description?: string, detail?: string, libraries?: any[]) {
 		this.code = code;
 		this.label = label;
+		this.fileExtension = fileExtension;
 		this.description = description;
 		this.detail = detail;
 		this.libraries = libraries || [];
@@ -37,7 +41,14 @@ function getLanugageQuickPickItems(): LanguageQuickPickItem[] {
 					libraries.push(lib);
 				});
 			}
-			let qpItem: LanguageQuickPickItem = new LanguageQuickPickItem(lang.code, lang.label, lang.description, lang.detail, libraries);
+			let qpItem: LanguageQuickPickItem = new LanguageQuickPickItem(
+				lang.code,
+				lang.label,
+				lang.fileextension || `.txt`,
+				lang.description,
+				lang.detail,
+				libraries
+			);
 			if (qpItem) {
 				quickPickItems.push(qpItem);
 			}
@@ -64,6 +75,7 @@ export async function genSnippet(res: AxiosResponse) {
 
 		if (langItemSelected) {
 			const lang: string = langItemSelected?.code || '';
+			const fileExtension: string = langItemSelected.fileExtension;
 
 			if (langItemSelected.libraries && langItemSelected.libraries.length > 0) {
 				let libQuickPickItems: LanguageQuickPickItem[] = [];
@@ -71,6 +83,7 @@ export async function genSnippet(res: AxiosResponse) {
 					let libQuickPickItem: LanguageQuickPickItem = new LanguageQuickPickItem(
 						lib.code,
 						lib.label,
+						lib.fileExtension,
 						lib.description,
 						lib.detail,
 						[]
@@ -86,11 +99,11 @@ export async function genSnippet(res: AxiosResponse) {
 				});
 
 				if (libSelected) {
-					constructSnippet(lang, libSelected.code || '');
+					constructSnippet(lang, fileExtension, libSelected.code || '');
 				}
 				libQuickPickItems = [];
 			} else {
-				constructSnippet(lang, '');
+				constructSnippet(lang, fileExtension, '');
 			}
 		}
 	} catch (err) {
@@ -103,10 +116,10 @@ export async function genSnippet(res: AxiosResponse) {
  * @param lang Language to generate a snippet for
  * @param library HTTP client/library to use to generate a snippet
  */
-function constructSnippet(lang: string, library?: string): void {
+async function constructSnippet(lang: string, fileExtension: string, library?: string): Promise<void> {
 	try {
 		const requestConfig: AxiosRequestConfig = svcResult.config;
-		let headers: Array<any> = [];
+		const headers: Array<any> = [];
 		Object.keys(svcResult.config.headers).forEach((key) => {
 			if (svcResult.config.headers[key].toString().indexOf('axios') < 0) {
 				headers.push({
@@ -116,7 +129,7 @@ function constructSnippet(lang: string, library?: string): void {
 			}
 		});
 
-		let har: any = {
+		const har: any = {
 			url: `${requestConfig.baseURL}${requestConfig.url}`.trim() || `https://yourdomain/api/`,
 			method: requestConfig.method?.toUpperCase() || 'GET',
 			headers: headers || [],
@@ -125,7 +138,7 @@ function constructSnippet(lang: string, library?: string): void {
 			}
 		};
 
-		let snippet = new HTTPSnippet(har);
+		const snippet = new HTTPSnippet(har);
 
 		let convertedSnippet: string = '';
 
@@ -143,17 +156,32 @@ function constructSnippet(lang: string, library?: string): void {
 			return;
 		}
 
-		let htmlContent = convertedSnippet;
+		const htmlContent = convertedSnippet;
 
-		let panel: vscode.WebviewPanel = AvaWebView.createGenericViewPanel(lang);
-		panel.webview.html = `<html>
+		try {
+			/** Show generated code a file */
+			const filename: string = `untitled${fileExtension || '.txt'}`;
+			const uri: vscode.Uri = vscode.Uri.file(path.join(__dirname, `../../temp/`, filename));
+
+			if (uri) {
+				const filePath = uri.fsPath;
+				writeFile(filePath, htmlContent, async () => {
+					const textDocument = await vscode.workspace.openTextDocument(filePath);
+					await vscode.window.showTextDocument(textDocument, vscode.ViewColumn.One);
+				});
+			}
+		} catch (e) {
+			// Show generated code as web view panel
+			const panel: vscode.WebviewPanel = AvaWebView.createGenericViewPanel(lang);
+			panel.webview.html = `<html>
 								<head>
 									${getStyleTagContent()}
                                 </head>
                                 <body>
                             		<textarea class='monospace' readonly>${htmlContent}</textarea>
                             	</body>
-                            </html>`;
+							</html>`;
+		}
 	} catch (err) {
 		vscode.window.showErrorMessage(err);
 	}

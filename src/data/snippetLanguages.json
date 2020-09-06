@@ -30,6 +30,7 @@
 		"label": "JavaScript",
 		"description": "XMLHttpRequest / jQuery.AJAX",
 		"detail": "Generates an HTTP request for browser-based JavaScript",
+		"fileextension": ".js",
 		"libraries": [
 			{
 				"code": "xhr",
@@ -62,6 +63,7 @@
 		"label": "NodeJS",
 		"description": "Native / Request / Unirest",
 		"detail": "JavaScript that runs outside of the web browser.",
+		"fileextension": ".js",
 		"libraries": [
 			{
 				"code": "native",
@@ -88,6 +90,7 @@
 		"label": "Java",
 		"description": "Unirest / OkHttp",
 		"detail": "A class-based, object-oriented langauge that runs inside JVM",
+		"fileextension": ".java",
 		"libraries": [
 			{
 				"code": "unirest",
@@ -120,6 +123,7 @@
 		"label": "C#",
 		"description": "RestSharp",
 		"detail": "A strongly-typed, component-oriented language (.NET)",
+		"fileextension": ".cs",
 		"libraries": [
 			{
 				"code": "httpclient",
@@ -140,6 +144,7 @@
 		"label": "PHP",
 		"description": "ext-curl; pecl/http v1; pecl/http v2",
 		"detail": "A hypertext preprocessor scripting langauge",
+		"fileextension": ".php",
 		"libraries": [
 			{
 				"code": "curl",
@@ -166,6 +171,7 @@
 		"label": "Python",
 		"description": "Python 3 / Requests",
 		"detail": "An interpreted, high-level, general-purpose programming language",
+		"fileextension": ".py",
 		"libraries": [
 			{
 				"code": "python3",
@@ -185,30 +191,35 @@
 		"code": "ruby",
 		"label": "Ruby",
 		"description": "Native",
-		"detail": "A dynamically typed, multi-paradigm programming language"
+		"detail": "A dynamically typed, multi-paradigm programming language",
+		"fileextension": ".rb"
 	},
 	{
 		"code": "swift",
 		"label": "Swift",
 		"description": "NSURLSession",
-		"detail": "Multi-paradigm, compiled language developed for Apple (c) devices"
+		"detail": "Multi-paradigm, compiled language developed for Apple (c) devices",
+		"fileextension": ".swift"
 	},
 	{
 		"code": "c",
 		"label": "C",
 		"description": "LibCurl",
-		"detail": "A programming language, constructs of which map to machine instructions"
+		"detail": "A programming language, constructs of which map to machine instructions",
+		"fileextension": ".c"
 	},
 	{
 		"code": "go",
 		"label": "Go",
 		"description": "Native HTTP client",
-		"detail": "A statically typed language with memory-safety and CSP-style concurrency"
+		"detail": "A statically typed language with memory-safety and CSP-style concurrency",
+		"fileextension": ".go"
 	},
 	{
 		"code": "r",
 		"label": "R",
 		"description": "HTTR - R HTTP client",
-		"detail": "A programming language for statistical computing and graphics"
+		"detail": "A programming language for statistical computing and graphics",
+		"fileextension": ".r"
 	}
 ]
