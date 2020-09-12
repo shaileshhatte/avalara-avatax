@@ -6,15 +6,15 @@ import * as requestGenerator from './requestGenerator';
 import * as requestWebviewClient from '../util/requestPanelClient';
 import * as nonceutil from '../util/nonceutil';
 import {
-	generateApiCategoryQuickPickItems,
-	generateApiEndpointQuickPickItems,
-	getTaxCalculationEndpoint,
-	getAddressValidationEndpoint,
-	getTestConnectionEndpoint
+    generateApiCategoryQuickPickItems,
+    generateApiEndpointQuickPickItems,
+    getTaxCalculationEndpoint,
+    getAddressValidationEndpoint,
+    getTestConnectionEndpoint
 } from '../providers/endpointsProvider';
 
 /** Local Constants */
-const SOMETHING_WENT_WRONG: string = `Something went wrong.`;
+const SOMETHING_WENT_WRONG: string = `Something went wrong. Please try again.`;
 const CHOOSE_ENDPOINT: string = `Choose an API endpoint to launch`;
 
 /**
@@ -24,71 +24,77 @@ const CHOOSE_ENDPOINT: string = `Choose an API endpoint to launch`;
  * @returns void
  */
 export function launchEndpoint(): void {
-	let endpoint: EndpointMethod | undefined;
-	try {
-		if (arguments[0]) {
-			endpoint = arguments[0];
-			if (!endpoint) {
-				console.log(SOMETHING_WENT_WRONG);
-				vscode.window.showErrorMessage(SOMETHING_WENT_WRONG);
-				return;
-			}
-			launchEndpointView(endpoint);
-		} else {
-			launchEndpointViaCommand();
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showInformationMessage(err);
-	}
+    let endpoint: EndpointMethod | undefined;
+    try {
+        if (arguments[0]) {
+            endpoint = arguments[0];
+            if (!endpoint) {
+                console.log(SOMETHING_WENT_WRONG);
+                vscode.window.showErrorMessage(SOMETHING_WENT_WRONG);
+                return;
+            }
+            launchEndpointView(endpoint);
+        } else {
+            launchEndpointViaCommand();
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showInformationMessage(err);
+    }
+}
+
+export function launchCustomEndpoint() {
+    let customEndpoint: EndpointMethod | undefined;
+    try {
+    } catch (err) {}
 }
 
 /**
  * Lancuhes a tax calculation endpoint
  */
 export function launchTaxCalculationEndpoint() {
-	let taxCalculationEndpoint: EndpointMethod | undefined;
-	try {
-		taxCalculationEndpoint = getTaxCalculationEndpoint();
-		if (taxCalculationEndpoint) {
-			launchEndpointView(taxCalculationEndpoint);
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage(err);
-	}
+    let taxCalculationEndpoint: EndpointMethod | undefined;
+    try {
+        taxCalculationEndpoint = getTaxCalculationEndpoint();
+        if (taxCalculationEndpoint) {
+            launchEndpointView(taxCalculationEndpoint);
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
 }
 
 /**
  * Launches an address validation endpoint
  */
 export function launchAddressCalculationEndpoint() {
-	let addressValidationEndpoint: EndpointMethod | undefined;
-	try {
-		addressValidationEndpoint = getAddressValidationEndpoint();
-		if (addressValidationEndpoint) {
-			launchEndpointView(addressValidationEndpoint);
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage(err);
-	}
+    let addressValidationEndpoint: EndpointMethod | undefined;
+    try {
+        addressValidationEndpoint = getAddressValidationEndpoint();
+        if (addressValidationEndpoint) {
+            launchEndpointView(addressValidationEndpoint);
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
 }
 
 /**
  * Launches a test connection endpoint
  */
 export function launchTestConnectionEndpoint() {
-	let testConnectionEndpoint: EndpointMethod | undefined;
-	try {
-		testConnectionEndpoint = getTestConnectionEndpoint();
-		if (testConnectionEndpoint) {
-			launchEndpointView(testConnectionEndpoint);
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage(err);
-	}
+    let testConnectionEndpoint: EndpointMethod | undefined;
+    try {
+        testConnectionEndpoint = getTestConnectionEndpoint();
+        if (testConnectionEndpoint) {
+            launchEndpointView(testConnectionEndpoint);
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
 }
 
 /**
@@ -96,18 +102,18 @@ export function launchTestConnectionEndpoint() {
  * @param endpoint EndpointMethod to launch view for
  */
 function launchEndpointView(endpoint: EndpointMethod) {
-	try {
-		if (endpoint) {
-			const requestPanelTitle: string = `${endpoint.method.toUpperCase()} ${endpoint.operationId}`;
-			const panel: vscode.WebviewPanel | undefined = AvaWebView.getOrCreateRequestViewPanel(requestPanelTitle);
-			if (panel) {
-				panel.webview.html = generateRequestWebviewContent(endpoint);
-			}
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage(err);
-	}
+    try {
+        if (endpoint) {
+            const requestPanelTitle: string = `${endpoint.method.toUpperCase()} ${endpoint.operationId}`;
+            const panel: vscode.WebviewPanel | undefined = AvaWebView.getOrCreateRequestViewPanel(requestPanelTitle);
+            if (panel) {
+                panel.webview.html = generateRequestWebviewContent(endpoint);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
 }
 
 /**
@@ -117,13 +123,13 @@ function launchEndpointView(endpoint: EndpointMethod) {
  * @returns HTML content for rendering on request webview panel
  */
 function generateRequestWebviewContent(endpoint: EndpointMethod): string {
-	const nonce = nonceutil.getNonce();
+    const nonce = nonceutil.getNonce();
 
-	const bodyContent = requestGenerator.getRequestContentHtml(endpoint);
-	const headTagContent = requestWebviewClient.getHeadContent(nonce);
-	const scriptTagContent = requestWebviewClient.getScriptContent(nonce);
+    const bodyContent = requestGenerator.getRequestContentHtml(endpoint);
+    const headTagContent = requestWebviewClient.getHeadContent(nonce);
+    const scriptTagContent = requestWebviewClient.getScriptContent(nonce);
 
-	const htmlContent = `<html> 
+    const htmlContent = `<html> 
 				${headTagContent}
 				<body>
 					<div id='main' data-method='${endpoint.method}' data-url='${endpoint.urlLabel}'>
@@ -134,34 +140,34 @@ function generateRequestWebviewContent(endpoint: EndpointMethod): string {
 			</html>
 		`;
 
-	return htmlContent;
+    return htmlContent;
 }
 
 /**
  * Launches an endpoint via command
  */
 async function launchEndpointViaCommand() {
-	try {
-		const pickedItem = await vscode.window.showQuickPick(generateApiCategoryQuickPickItems(), {
-			matchOnDescription: true,
-			placeHolder: `Select an API category to launch an endpoint`,
-			matchOnDetail: true
-		});
+    try {
+        const pickedItem = await vscode.window.showQuickPick(generateApiCategoryQuickPickItems(), {
+            matchOnDescription: true,
+            placeHolder: `Select an API category to launch an endpoint`,
+            matchOnDetail: true
+        });
 
-		if (pickedItem?.label) {
-			const epItem = await vscode.window.showQuickPick(generateApiEndpointQuickPickItems(pickedItem.label), {
-				matchOnDescription: true,
-				matchOnDetail: true,
-				placeHolder: CHOOSE_ENDPOINT
-			});
-			if (epItem) {
-				if (epItem) {
-					launchEndpointView(epItem.endpoint);
-				}
-			}
-		}
-	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage(err);
-	}
+        if (pickedItem?.label) {
+            const epItem = await vscode.window.showQuickPick(generateApiEndpointQuickPickItems(pickedItem.label), {
+                matchOnDescription: true,
+                matchOnDetail: true,
+                placeHolder: CHOOSE_ENDPOINT
+            });
+            if (epItem) {
+                if (epItem) {
+                    launchEndpointView(epItem.endpoint);
+                }
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
 }

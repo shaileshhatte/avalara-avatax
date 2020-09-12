@@ -2,11 +2,11 @@ import * as vscode from 'vscode';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AvaWebView } from './basewebview';
 import * as nonceutil from '../util/nonceutil';
+import { writeFile } from 'fs';
+import path = require('path');
 const HTTPSnippet = require('httpsnippet');
 
 import * as LANGUAGE_ITEMS from '../data/snippetLanguages.json';
-import { writeFile } from 'fs';
-import path = require('path');
 
 let svcResult: AxiosResponse;
 
@@ -31,6 +31,9 @@ class LanguageQuickPickItem implements vscode.QuickPickItem {
 	}
 }
 
+/**
+ * Generates a collection of language quick pick items of type `LanguageQuickPickItem`
+ */
 function getLanugageQuickPickItems(): LanguageQuickPickItem[] {
 	const quickPickItems: LanguageQuickPickItem[] = [];
 	try {

@@ -16,8 +16,8 @@ let contentDisposition: any = {
  * Processes the HTTP service response that's received.
  * @param result HTTP response received from the service
  */
-export async function processResponse(result: AxiosResponse | AxiosError) {
-	svcResult = (result as AxiosResponse) || (result as AxiosError).response;
+export async function processResponse(result: any) {
+	svcResult = result.isAxiosError ? result.response : result;
 	if ((result as AxiosResponse).status >= 200 && (result as AxiosResponse).status <= 300) {
 		await handleResponseSuccess(result as AxiosResponse);
 	} else {

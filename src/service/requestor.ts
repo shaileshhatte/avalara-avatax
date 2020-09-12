@@ -12,24 +12,24 @@ import { processResponse } from '../helpers/responseHelper';
  * @param axiosConfig Axios Request configuration object
  */
 export function sendRequest(axiosConfig: axiosModule.AxiosRequestConfig) {
-	try {
-		vscode.window.withProgress(
-			{
-				location: vscode.ProgressLocation.Notification,
-				cancellable: false,
-				title: `Request in progress...`
-			},
-			() => {
-				return axios(axiosConfig)
-					.then((res) => {
-						processResponse(res);
-					})
-					.catch((err) => {
-						processResponse(err);
-					});
-			}
-		);
-	} catch (err) {
-		vscode.window.showErrorMessage(err);
-	}
+    try {
+        vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                cancellable: false,
+                title: `Request in progress...`
+            },
+            () => {
+                return axios(axiosConfig)
+                    .then((res) => {
+                        processResponse(res);
+                    })
+                    .catch((err) => {
+                        processResponse(err);
+                    });
+            }
+        );
+    } catch (err) {
+        vscode.window.showErrorMessage(err);
+    }
 }

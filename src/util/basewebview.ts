@@ -141,7 +141,7 @@ const createWebView = (title: string): vscode.WebviewPanel => {
 		{
 			enableCommandUris: true,
 			enableScripts: true,
-			enableFindWidget: title === responsePanelTitle,
+			enableFindWidget: true,
 			retainContextWhenHidden: title !== responsePanelTitle
 		}
 	);
