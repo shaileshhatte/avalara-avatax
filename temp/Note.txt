@@ -1,0 +1,2 @@
+DO NOT DELETE this folder.
+This folder is used to store the generated code snippet files.
