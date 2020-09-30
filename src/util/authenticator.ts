@@ -4,53 +4,63 @@ import * as keytar from 'keytar';
 import { launchTestConnectionEndpoint } from '../helpers/requestLauncher';
 import { AVConstants } from './avconstants';
 
+/** Local constants */
+const CREDENTIALS_ACCOUNT_INPUT_PROMPT: string = `Your AvaTax Account ID or Username`;
+const CREDENTIALS_ACCOUNT_INPUT_PLACEHOLDER: string = `Account ID or Username`;
+const CREDENTIALS_LKEY_INPUT_PROMPT: string = `License Key or Account password`;
+const CREDENTIALS_LKEY_INPUT_PLACEHOLDER: string = `Enter your AvaTax License Key or Account password.`;
+const PING_AVATAX_PROMPT: string = `AvaTax credentials stored successfully!`;
+const PING_AVATAX_BUTTON_TITLE: string = `Ping AvaTax (Recommended)`;
+const PING_AVATAX_INFO: string = `Click 'Send Request' to ping AvaTax API.`;
+const PROBLEM_STORING_CREDENTIALS: string = `Credentials could not be stored in the system.`;
+const CREDENTIALS_NOT_AVAILABLE: string = `AvaTax credentials may not be set up.`;
+
 /**
  * Sets up AvaTax credentials via command.
- * Replaces the existing account with the newly entered details.
+ * Replaces the existing account with the newly entered credentials.
+ * @returns Promise that resolves when the credentials are stored successfully.
  */
-export async function setupAvataxCredentials() {
-	try {
-		const storedAccountId = getATConfiguration(AVConstants.avataxAccountNumberConfigName) || ``;
-		let avataxKey: string | undefined;
-		const enteredAccountId = await window.showInputBox({
-			value: (storedAccountId as string) || '',
-			prompt: `Your AvaTax Account ID or Username`,
-			ignoreFocusOut: true,
-			placeHolder: `Account ID or Username`
-		});
+export async function setupAvataxCredentials(): Promise<void> {
+    try {
+        const storedAccountId = getATConfiguration(AVConstants.avataxAccountNumberConfigName) || ``; // Retrive existing account no., if any.
+        let avataxKey: string | undefined;
+        const enteredAccountId = await window.showInputBox({
+            value: (storedAccountId as string) || '',
+            prompt: CREDENTIALS_ACCOUNT_INPUT_PROMPT,
+            ignoreFocusOut: true,
+            placeHolder: CREDENTIALS_ACCOUNT_INPUT_PLACEHOLDER
+        });
 
-		if (enteredAccountId) {
-			avataxKey = await window.showInputBox({
-				password: true,
-				prompt: `License Key or Account password`,
-				ignoreFocusOut: true,
-				placeHolder: `Enter your AvaTax License Key or Account password.`
-			});
+        if (enteredAccountId) {
+            avataxKey = await window.showInputBox({
+                password: true,
+                prompt: CREDENTIALS_LKEY_INPUT_PROMPT,
+                ignoreFocusOut: true,
+                placeHolder: CREDENTIALS_LKEY_INPUT_PLACEHOLDER
+            });
+            if (avataxKey) {
+                await setCredentials(enteredAccountId, avataxKey);
+                await updateATConfiguration(AVConstants.avataxAccountNumberConfigName, enteredAccountId); // Update account no. in ext settings
+                // Offer to ping AvaTax service
+                const res = await window.showInformationMessage(PING_AVATAX_PROMPT, {
+                    title: PING_AVATAX_BUTTON_TITLE,
+                    id: `yes`
+                });
+                if (res?.id === `yes`) {
+                    await launchTestConnectionEndpoint();
+                    await window.showInformationMessage(PING_AVATAX_INFO);
+                }
+            }
 
-			if (avataxKey) {
-				await setCredentials(enteredAccountId, avataxKey);
-				await updateATConfiguration(AVConstants.avataxAccountNumberConfigName, enteredAccountId); // Update account number in extension settings with the new one
-
-				// Popup with an option to test connection
-				const res = await window.showInformationMessage(`AvaTax credentials stored successfully!`, {
-					title: `Test Connection (Recommended)`,
-					id: `yes`
-				});
-				if (res?.id === `yes`) {
-					await launchTestConnectionEndpoint();
-					await window.showInformationMessage(`Click 'Send Request' to test connection to AvaTax.`);
-				}
-			}
-
-			// Remove existing account credentials if not the same
-			if (enteredAccountId !== storedAccountId) {
-				deleteCredentials(storedAccountId as string);
-			}
-		}
-	} catch (err) {
-		console.error(err);
-		window.showErrorMessage(err);
-	}
+            // Remove existing account credentials if not the same
+            if (enteredAccountId !== storedAccountId) {
+                deleteCredentials(storedAccountId as string);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        window.showErrorMessage(err);
+    }
 }
 
 /**
@@ -60,12 +70,12 @@ export async function setupAvataxCredentials() {
  * @param key License key or password
  */
 async function setCredentials(accountid: string, key: string): Promise<void> {
-	try {
-		return await keytar.setPassword(AVConstants.keytarServiceName, accountid, key);
-	} catch (err) {
-		console.error(err);
-		window.showErrorMessage(`Credentials could not be stored in the system.`);
-	}
+    try {
+        return await keytar.setPassword(AVConstants.keytarServiceName, accountid, key);
+    } catch (err) {
+        console.error(err);
+        window.showErrorMessage(PROBLEM_STORING_CREDENTIALS);
+    }
 }
 
 /**
@@ -73,18 +83,18 @@ async function setCredentials(accountid: string, key: string): Promise<void> {
  * @param accountid Account ID or user name
  */
 export async function getCredentials(accountid: string): Promise<string | null> {
-	let storedAvataxKey: string | null = null;
-	try {
-		storedAvataxKey = await keytar.getPassword(AVConstants.keytarServiceName, accountid);
-		if (!storedAvataxKey) {
-			return Promise.reject(`AvaTax credentials may not be set up.`);
-		}
-	} catch (err) {
-		console.error(err);
-		window.showErrorMessage(err);
-	}
+    let storedAvataxKey: string | null = null;
+    try {
+        storedAvataxKey = await keytar.getPassword(AVConstants.keytarServiceName, accountid);
+        if (!storedAvataxKey) {
+            return Promise.reject(CREDENTIALS_NOT_AVAILABLE);
+        }
+    } catch (err) {
+        console.error(err);
+        window.showErrorMessage(err);
+    }
 
-	return Promise.resolve(storedAvataxKey);
+    return Promise.resolve(storedAvataxKey);
 }
 
 /**
@@ -92,20 +102,20 @@ export async function getCredentials(accountid: string): Promise<string | null> 
  * @param accountid Account ID or user name
  */
 export async function deleteCredentials(accountId?: string) {
-	let deletePromise = null;
-	let accountToRemove;
-	if (accountId) {
-		accountToRemove = accountId;
-	} else {
-		accountToRemove = getATConfiguration(AVConstants.avataxAccountNumberConfigName);
-	}
-	try {
-		if (accountToRemove) {
-			deletePromise = await keytar.deletePassword(AVConstants.keytarServiceName, accountToRemove as string);
-		}
-	} catch (err) {
-		console.error(err);
-		window.showErrorMessage(`Couldn't remove the AvaTax credentials: ${accountToRemove}. Error: ${err}`);
-	}
-	return deletePromise;
+    let deletePromise = null;
+    let accountToRemove;
+    if (accountId) {
+        accountToRemove = accountId;
+    } else {
+        accountToRemove = getATConfiguration(AVConstants.avataxAccountNumberConfigName);
+    }
+    try {
+        if (accountToRemove) {
+            deletePromise = await keytar.deletePassword(AVConstants.keytarServiceName, accountToRemove as string);
+        }
+    } catch (err) {
+        console.error(err);
+        window.showErrorMessage(`Couldn't remove the AvaTax credentials: ${accountToRemove}. Error: ${err}`);
+    }
+    return deletePromise;
 }
