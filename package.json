@@ -90,13 +90,7 @@
                     "type": "string",
                     "default": "",
                     "scope": "application",
-                    "description": "Avalara Account ID or User Name"
-                },
-                "avalara.avataxlicensekey": {
-                    "type": "string",
-                    "default": "",
-                    "scope": "application",
-                    "description": "API License Key or Account Password"
+                    "description": "Avalara Account ID or User Name (DO NOT MODIFY)"
                 },
                 "avalara.requesttimeout": {
                     "type": "number",

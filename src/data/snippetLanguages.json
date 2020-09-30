@@ -121,7 +121,7 @@
     {
         "code": "csharp",
         "label": "C#",
-        "description": "RestSharp",
+        "description": "httpclient / RestSharp",
         "detail": "A strongly-typed, component-oriented language (.NET)",
         "fileextension": ".cs",
         "libraries": [
