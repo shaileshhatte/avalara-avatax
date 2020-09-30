@@ -68,20 +68,6 @@
                 "contents": "No endpoint found, or Swagger.json not loaded properly."
             }
         ],
-        "menus": {
-            "view/item/context": [
-                {
-                    "command": "endpoint.launch",
-                    "when": "view == api-endpoints && viewItem == endpoint"
-                }
-            ],
-            "view/title": [
-                {
-                    "command": "endpoint.launch",
-                    "when": "view == api-endpoints && viewItem == endpoint"
-                }
-            ]
-        },
         "customEditors": [
             {
                 "viewType": "endpoint.request",

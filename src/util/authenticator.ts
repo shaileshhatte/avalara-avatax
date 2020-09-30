@@ -1,3 +1,11 @@
+/****************************************************************************
+ * This module is responsible for handling AvaTax authentication operations.
+ * Responsibilities include:
+ * ... Setting up new credentials
+ * ... Retrieving existing credentials
+ * ... Delete credentials
+ ****************************************************************************/
+
 import { window } from 'vscode';
 import { updateATConfiguration, getATConfiguration } from './configurationProvider';
 import * as keytar from 'keytar';

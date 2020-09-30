@@ -49,6 +49,7 @@ async function handleResponseSuccess(result: AxiosResponse): Promise<void> {
                 switch (val?.title) {
                     case 'Download':
                         saveResponseBody();
+                        AvaWebView.getOrCreateResponseViewPanel().webview.html = ``;
                         break;
                     default:
                         AvaWebView.getOrCreateResponseViewPanel().webview.html = generateResponseHtml(result);
