@@ -19,9 +19,7 @@ class EndpointTreeItem extends vscode.TreeItem {
         };
     }
 
-    tooltip = `${this.endpoint.urlLabel}\n\nMethod: ${this.endpoint.method.toUpperCase()}\nOperation: ${this.endpoint.operationId}\n\n${
-        this.endpoint.summary
-    }`;
+    tooltip = `${this.endpoint.urlLabel}\n\nMethod: ${this.endpoint.method.toUpperCase()}\nOperation: ${this.endpoint.operationId}\n\n${this.endpoint.summary}`;
     description = this.endpoint.method ? this.endpoint.method.toString().toUpperCase() : '';
 }
 
@@ -139,19 +137,7 @@ function generateApiCategories(): ApiCategory[] {
  * @returns `EndpointMethod` object
  */
 function createEndpointMethod(url: string, method: string, tag: string, ep: any): EndpointMethod {
-    return new EndpointMethod(
-        url,
-        method,
-        tag,
-        ep.summary,
-        ep.description,
-        ep.operationId,
-        ep.consumes,
-        ep.produces,
-        ep.parameters,
-        ep.responses,
-        ep.security
-    );
+    return new EndpointMethod(url, method, tag, ep.summary, ep.description, ep.operationId, ep.consumes, ep.produces, ep.parameters, ep.responses, ep.security);
 }
 
 /**
@@ -204,12 +190,7 @@ export function generateApiEndpointQuickPickItems(apiCategory: string): Endpoint
     try {
         const apiEndpoints: EndpointTreeItem[] = generateApiEndpointTreeItems(apiCategory);
         apiEndpoints.forEach((ep) => {
-            const qpItem: EndpointQuickPickItem = new EndpointQuickPickItem(
-                ep.label || ep.endpoint.urlLabel,
-                ep.description,
-                ep.endpoint.description,
-                ep.endpoint
-            );
+            const qpItem: EndpointQuickPickItem = new EndpointQuickPickItem(ep.label || ep.endpoint.urlLabel, ep.description, ep.endpoint.description, ep.endpoint);
             quickPickItems.push(qpItem);
         });
     } catch (err) {

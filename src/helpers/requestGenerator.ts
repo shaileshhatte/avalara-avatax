@@ -16,8 +16,7 @@ export function getRequestContentHtml(ept: EndpointMethod): string {
     endpoint = ept;
     let requestContentHtml: string = '';
     try {
-        requestContentHtml +=
-            generateTitleButtonsHtml() + generateEndpointDescription() + '<table>' + generateRequestContent() + '</table>';
+        requestContentHtml += generateTitleButtonsHtml() + generateEndpointDescription() + '<table>' + generateRequestContent() + '</table>';
     } catch (err) {
         console.error(err);
     }
@@ -87,15 +86,7 @@ function generateRequestContent(): string {
         let isModelBodyRequired: boolean = false;
 
         parameters.forEach((param: any) => {
-            let paramModel = new Parameter(
-                param.name || '',
-                param.in || '',
-                param.description || '',
-                param.required || false,
-                param.schema,
-                param.format,
-                param.default
-            );
+            let paramModel = new Parameter(param.name || '', param.in || '', param.description || '', param.required || false, param.schema, param.format, param.default);
             if (!!paramModel.schema && paramModel.inLocation === 'body') {
                 pathHasSchema = !pathHasSchema;
                 schemaRef = paramModel.schema['$ref'] || paramModel.schema[`items`][`$ref`];
@@ -165,16 +156,12 @@ function getEditableParametersContent(editableParametersMap: Map<string, Paramet
 
                 htmlContent += `<tr>
 									<td>
-										<span class='param-name monospace' title='${param.description}'>${param.name} ${
-                    param.required ? '<span class="required-flag">(Required)' : ''
-                }</span>
+										<span class='param-name monospace' title='${param.description}'>${param.name} ${param.required ? '<span class="required-flag">(Required)' : ''}</span>
 									</td>
 									<td class='input-background'>
 										<input data-type='${location}' data-paramname='${param.name}' class='input-${param.required.toString()} input-${
                     param.inLocation
-                } input-rounded-border monospace input-box' type='${inputType}' required=${param.required} placeholder='${
-                    param.defaultValue || inputType
-                }' value='${param.defaultValue || ''}'>
+                } input-rounded-border monospace input-box' type='${inputType}' required=${param.required} placeholder='${param.defaultValue || inputType}' value='${param.defaultValue || ''}'>
 									</td>
 							</tr>
 							`;
