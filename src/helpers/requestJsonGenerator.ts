@@ -6,20 +6,20 @@ const definitions: any = swaggerJson.definitions;
 /**
  * Returns/converts schema to JSON string
  * @param model Model to be converted to JSON example
- * @param generateFullModel If set to true, full example model is generated
+ * @param generateFullModelExample If set to true, full model example is returned
  * @param onlyModel If set to true, only model definition is returned
  */
-export function convertSchemaToJson(model: string, generateFullModel?: boolean, onlyModel?: boolean): any {
+export function convertSchemaToJson(model: string, generateFullModelExample?: boolean, onlyModel?: boolean): any {
     const schemaModel = definitions[model];
 
-    if (!!onlyModel) {
+    if (onlyModel) {
         return schemaModel;
     }
 
     let jsonObject: any = {};
 
     try {
-        if (!!schemaModel.example && !generateFullModel) {
+        if (!!schemaModel.example && !generateFullModelExample) {
             return schemaModel.example;
         }
 
@@ -37,8 +37,10 @@ export function convertSchemaToJson(model: string, generateFullModel?: boolean, 
                             if (!!propObject.enum) {
                                 let possibleValues = propObject.enum;
                                 jsonObject[propKey] = possibleValues[getRandomArbitraryNumber(0, possibleValues.length)];
+                            } else {
+                                jsonObject[propKey] = generateRandomString(15);
                             }
-                            jsonObject[propKey] = generateRandomString(15);
+
                             break;
 
                         case 'number':
@@ -49,7 +51,7 @@ export function convertSchemaToJson(model: string, generateFullModel?: boolean, 
                             let refArr = propObject.items['$ref'].split('/');
                             let innerModel = refArr[refArr.length - 1];
                             let items: any[] = [];
-                            items.push(convertSchemaToJson(innerModel), generateFullModel);
+                            items.push(convertSchemaToJson(innerModel), generateFullModelExample);
                             jsonObject[propKey] = items;
                             break;
 
@@ -73,7 +75,7 @@ export function convertSchemaToJson(model: string, generateFullModel?: boolean, 
                     let refArr = propObject['$ref'].split('/');
                     let innerModel = refArr[refArr.length - 1];
 
-                    jsonObject[propKey] = convertSchemaToJson(innerModel, generateFullModel);
+                    jsonObject[propKey] = convertSchemaToJson(innerModel, generateFullModelExample);
                 }
             });
         }

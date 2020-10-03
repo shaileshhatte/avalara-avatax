@@ -6,9 +6,17 @@ body {
     font-family: input, menlo, lucida console, monospace;
 }
 
+/** Header label ********************
+/* Dark & High Constrast **/
 .header-label {
     color: #f16f6f;
 }
+
+/* Light */
+.vscode-light .header-label {
+    color: #d61c1c;
+}
+/************************************/
 
 .header-div {
     line-height: 80%;
@@ -17,6 +25,10 @@ body {
 
 .base-url {
     color: #5baeff;
+}
+
+.vscode-light .base-url {
+    color: #2178cc;
 }
 
 textarea {
@@ -63,7 +75,7 @@ textarea:focus {
     height: 100%;
     margin: 2px 0 8px 0;
     background-color: var(--vscode-button-background);
-    color: var(--vscode-editor-foreground);
+    color: var(--vscode-button-foreground);
     border-radius: 2px;
     padding: 5px 0 5px 0;
     border-color: var(--vscode-button-background);
@@ -76,22 +88,6 @@ textarea:focus {
 
 .action-buttons-div {
     float: right;
-}
-
-.json-key {
-    color: #89d0d4;
-}
-
-.json-number {
-    color: #d8d842;
-}
-
-.json-string {
-    color: var(--vscode-editor-foreground);
-}
-
-.json-boolean {
-    color: #3fcc27;
 }
 
 .res-body {
@@ -134,3 +130,35 @@ textarea:focus {
     font-size: 32px;
     padding-bottom: 16px;
 }
+
+/************ Response JSON – For Dark and High Constrast themes *****/
+.json-key {
+    color: #89d0d4;
+}
+
+.json-number {
+    color: #d8d842;
+}
+
+.json-string {
+    color: var(--vscode-editor-foreground);
+}
+
+.json-boolean {
+    color: #3fcc27;
+}
+
+/************ Response JSON – For Light theme *****/
+.vscode-light .json-key {
+    color: #0045e4;
+}
+
+.vscode-light .json-number {
+    color: #c1318e;
+}
+
+.vscode-light .json-boolean {
+    color: #2fa20b;
+}
+
+/************************************************************/

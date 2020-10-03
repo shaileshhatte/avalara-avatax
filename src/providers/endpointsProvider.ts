@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as swaggerJson from '../data/swagger.json';
+import * as favouriteEndpointsJson from '../data/favouriteEndpoints.json';
 import { EndpointMethod } from '../models/EndpointMethod';
 
 let tags: string[] = [];
@@ -131,7 +134,7 @@ function generateApiCategories(): ApiCategory[] {
 /**
  * Creates an endpoint of of type 'EndpointMethod' with given parameters.
  * @param url URL of an endpoint
- * @param method Method (e.g. GET, POST) of the endpoint
+ * @param method Method (e.g. `GET`, `POST`) of the endpoint
  * @param tag API category this endpoint belongs to
  * @param ep Endpoint object from the API specification file (Swagger.json)
  * @returns `EndpointMethod` object
@@ -265,4 +268,45 @@ export function getTestConnectionEndpoint(): EndpointMethod | undefined {
     }
 
     return testConnectionEndpoint;
+}
+
+export function addToFavourites() {
+    // console.log(`Inside addToFavourites`);
+    // console.log(arguments[0]);
+
+    try {
+        let jsonContent: any = favouriteEndpointsJson;
+        const endpoints: any[] = favouriteEndpointsJson.endpoints || [];
+
+        const alreadyExists = endpoints.filter((ep) => {
+            return ep.label === arguments[0].label && ep.method == arguments[0].endpoint.method && ep.tag === arguments[0].endpoint.tag;
+        });
+
+        if (alreadyExists.length) {
+            vscode.window.showWarningMessage(`Endpoint already exists in Favourites.`);
+            return;
+        }
+
+        const favouriteEndpoint = {
+            label: arguments[0].label,
+            method: arguments[0].endpoint.method,
+            tag: arguments[0].endpoint.tag
+        };
+
+        endpoints.push(favouriteEndpoint);
+
+        jsonContent.endpoints = endpoints;
+
+        fs.writeFile(path.join(__dirname, `../data/`, `favouriteEndpoints.json`), JSON.stringify(jsonContent), (err) => {
+            if (!err) {
+                vscode.commands.executeCommand(`favouriteendpointsview.refresh`);
+                // vscode.window.showInformationMessage(`Added to favourites.`);
+                return;
+            }
+            vscode.window.showErrorMessage(err.message);
+        });
+    } catch (error) {
+        vscode.window.showErrorMessage(error);
+        console.error(error);
+    }
 }

@@ -47,3 +47,34 @@ export class DefinitionsProvider implements vscode.TreeDataProvider<ModelDefinit
         return modelDefinitions;
     };
 }
+
+class DefinitionQuickPickItem implements vscode.QuickPickItem {
+    label: string;
+    description?: string | undefined;
+
+    constructor(label: string, description: string) {
+        this.label = label;
+        this.description = description;
+    }
+}
+
+export function generateDefinitionQuickPickItems(): DefinitionQuickPickItem[] {
+    let quickPickItems: DefinitionQuickPickItem[] = [];
+
+    try {
+        const definitions: any = swaggerJson.definitions;
+        Object.keys(definitions)
+            .sort()
+            .forEach((definition) => {
+                const definitionDescription: string = definitions[definition][`description`];
+
+                let defQPItem: DefinitionQuickPickItem = new DefinitionQuickPickItem(definition, definitionDescription);
+                quickPickItems.push(defQPItem);
+            });
+    } catch (error) {
+        console.error(error);
+        vscode.window.showErrorMessage(error);
+    }
+
+    return quickPickItems;
+}

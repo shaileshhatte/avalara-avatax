@@ -5,13 +5,7 @@ import { EndpointMethod } from '../models/EndpointMethod';
 import * as requestGenerator from './requestGenerator';
 import * as requestWebviewClient from '../util/requestPanelClient';
 import * as nonceutil from '../util/nonceutil';
-import {
-    generateApiCategoryQuickPickItems,
-    generateApiEndpointQuickPickItems,
-    getTaxCalculationEndpoint,
-    getAddressValidationEndpoint,
-    getTestConnectionEndpoint
-} from '../providers/endpointsProvider';
+import { generateApiCategoryQuickPickItems, generateApiEndpointQuickPickItems, getTaxCalculationEndpoint, getAddressValidationEndpoint, getTestConnectionEndpoint } from '../providers/endpointsProvider';
 
 /** Local Constants */
 const SOMETHING_WENT_WRONG: string = `Something went wrong. Please try again.`;
@@ -41,12 +35,6 @@ export function launchEndpoint(): void {
         console.error(err);
         vscode.window.showInformationMessage(err);
     }
-}
-
-export function launchCustomEndpoint() {
-    let customEndpoint: EndpointMethod | undefined;
-    try {
-    } catch (err) {}
 }
 
 /**

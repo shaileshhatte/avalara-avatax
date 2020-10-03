@@ -1,131 +1,143 @@
 body {
-	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
 }
 
 table {
-	border-collapse: collapse;
-	width: 100%;
-	font-size: 100%;
-	margin-top: 10px;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 100%;
+    margin-top: 10px;
 }
 
 td,
 th {
-	border: 1px dotted var(--vscode-descriptionForeground);
-	text-align: left;
-	padding: 8px;
+    border: 1px dotted var(--vscode-descriptionForeground);
+    text-align: left;
+    padding: 8px;
 }
 
 tr.heading {
-	background-color: var(--vscode-input-background);
+    background-color: var(--vscode-input-background);
 }
 
 .td-center {
-	text-align: center;
+    text-align: center;
 }
 
 textarea {
-	width: 98%;
-	max-width: 800px;
-	min-width: 400px;
-	height: 700px;
-	min-height: 400px;
-	max-height: 700px;
-	background-color: var(--vscode-input-background);
-	color: var(--vscode-input-foreground);
-	line-height: 18px;
-	letter-spacing: 0.05rem;
-	padding: 5px;
-	border: var(--vscode-input-border);
-	font-size: var(--vscode-font-size);
+    width: 98%;
+    max-width: 800px;
+    min-width: 400px;
+    height: 700px;
+    min-height: 400px;
+    max-height: 700px;
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    line-height: 18px;
+    letter-spacing: 0.05rem;
+    padding: 5px;
+    border: var(--vscode-input-border);
+    font-size: var(--vscode-font-size);
 }
 
 textarea:focus {
-	outline-color: transparent;
+    outline-color: transparent;
 }
 
 input {
-	width: 98%;
-	height: 20px;
-	padding: 0 2px 0 5px;
-	background-color: var(--vscode-input-background);
-	color: var(--vscode-input-foreground);
-	border: var(--vscode-input-border);
+    width: 98%;
+    height: 20px;
+    padding: 0 2px 0 5px;
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border: var(--vscode-input-border);
 }
 
 .bold-text {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .input-rounded-border {
-	border-radius: 1px;
+    border-radius: 1px;
 }
 
 .required-flag {
-	color: #e9967a;
-	font-style: italic;
-	font-size: x-small;
+    color: #e9967a;
+    font-style: italic;
+    font-size: x-small;
 }
 
 .monospace {
-	font-family: Input, menlo, lucida console, monospace;
+    font-family: Input, menlo, lucida console, monospace;
 }
 
 .btn-send {
-	width: 100px;
-	height: 100%;
-	float: right;
-	margin: 10px 0 8px 0;
-	background-color: var(--vscode-button-background);
-	color: var(--vscode-button-foreground);
-	border-radius: 2px;
-	padding: 5px 0 5px 0;
+    width: 100px;
+    height: 100%;
+    float: right;
+    margin: 10px 0 8px 0;
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border-radius: 2px;
+    padding: 5px 0 5px 0;
 }
 
 .btn-send:hover {
-	background-color: var(--vscode-button-hoverBackground);
-	cursor: pointer;
+    background-color: var(--vscode-button-hoverBackground);
+    cursor: pointer;
 }
 
 .endpoint-label {
-	float: left;
-	padding: 15px 0 0 0px;
-	font-style: italic;
-	color: gray;
+    float: left;
+    padding: 15px 0 0 0px;
+    font-style: italic;
+    color: gray;
 }
 
 .endpoint-label {
-	color: var(--vscode-descriptionForeground);
+    color: var(--vscode-descriptionForeground);
 }
 
 .request-body {
-	padding: 5px;
+    padding: 5px;
 }
 
 .model-label {
-	float: right;
+    float: right;
 }
 
 a {
-	color: var(--vscode-descriptionForeground);
-	letter-spacing: 0.05rem;
+    color: var(--vscode-descriptionForeground);
+    letter-spacing: 0.05rem;
 }
 
 a:hover,
 a:active {
-	color: var(--vscode-input-foreground);
+    color: var(--vscode-input-foreground);
 }
 
 .endpoint-description {
-	color: var(--vscode-descriptionForeground);
-	letter-spacing: 0.02rem;
-	line-height: 20px;
+    color: var(--vscode-descriptionForeground);
+    letter-spacing: 0.02rem;
+    line-height: 20px;
 }
 
 .description-section {
-	margin-top: 30px;
+    margin-top: 30px;
 }
 
 .description-div {
-	display: none;
+    display: none;
+}
+
+.vscode-light .input-background input,
+.vscode-light textarea {
+    background-color: #f0f0f0;
+    color: var(--vscode-editor-foreground);
+}
+
+.vscode-dark .input-background input,
+.vscode-dark textarea {
+    background-color: #3c3c3c;
+    color: var(--vscode-editor-foreground);
 }

@@ -90,9 +90,9 @@ function generateRequestContent(): string {
             if (!!paramModel.schema && paramModel.inLocation === 'body') {
                 pathHasSchema = !pathHasSchema;
                 schemaRef = paramModel.schema['$ref'] || paramModel.schema[`items`][`$ref`];
-                if (paramModel.schema[`type`] && paramModel.schema[`type`] === `array`) {
-                    isModelArrayOfItems = !isModelArrayOfItems;
-                }
+
+                isModelArrayOfItems = paramModel.schema[`type`] && paramModel.schema[`type`] === `array`;
+
                 return true;
             } else {
                 const tempParameters = editableParametersMap.get(paramModel.inLocation) || [];
@@ -159,9 +159,9 @@ function getEditableParametersContent(editableParametersMap: Map<string, Paramet
 										<span class='param-name monospace' title='${param.description}'>${param.name} ${param.required ? '<span class="required-flag">(Required)' : ''}</span>
 									</td>
 									<td class='input-background'>
-										<input data-type='${location}' data-paramname='${param.name}' class='input-${param.required.toString()} input-${
-                    param.inLocation
-                } input-rounded-border monospace input-box' type='${inputType}' required=${param.required} placeholder='${param.defaultValue || inputType}' value='${param.defaultValue || ''}'>
+										<input data-type='${location}' data-paramname='${param.name}' class='input-${param.required.toString()} input-${param.inLocation} input-rounded-border monospace input-box' type='${inputType}' required=${param.required} placeholder='${
+                    param.defaultValue || inputType
+                }' value='${param.defaultValue || ''}'>
 									</td>
 							</tr>
 							`;

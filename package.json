@@ -11,11 +11,15 @@
     ],
     "activationEvents": [
         "onView:api-endpoints",
+        "onView:favourite-endpoints",
         "onView:definition-models",
         "onCommand:endpoint.launch",
         "onCommand:taxendpoint.launch",
         "onCommand:addressendpoint.launch",
-        "onCommand:avatax.setup"
+        "onCommand:avatax.setup",
+        "onCommand:model.example.launch",
+        "onCommand:endpoint.addtofavourites",
+        "onCommand:endpoint.removefromfavourites"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -28,7 +32,8 @@
             {
                 "command": "endpoint.launch",
                 "title": "Launch API Request",
-                "category": "Avalara"
+                "category": "Avalara",
+                "icon": "$(search)"
             },
             {
                 "command": "taxendpoint.launch",
@@ -39,6 +44,26 @@
                 "command": "addressendpoint.launch",
                 "title": "Address Validation (ResolvePost)",
                 "category": "Avalara"
+            },
+            {
+                "command": "model.example.launch",
+                "title": "View Model Example",
+                "category": "Avalara",
+                "icon": "$(json)"
+            },
+            {
+                "command": "endpoint.addtofavourites",
+                "title": "Add to Favourites",
+                "icon": "$(star)"
+            },
+            {
+                "command": "endpoint.removefromfavourites",
+                "title": "Remove from Favourites",
+                "icon": "$(star-full)"
+            },
+            {
+                "command": "favouriteendpointsview.refresh",
+                "title": "Refresh Favourites Tree View"
             }
         ],
         "viewsContainers": {
@@ -53,31 +78,73 @@
         "views": {
             "avatax-api-explorer": [
                 {
+                    "id": "favourite-endpoints",
+                    "name": "Favourites",
+                    "contextualTitle": "Favourites (Avalara)",
+                    "icon": "$(star-full)"
+                },
+                {
                     "id": "api-endpoints",
-                    "name": "API Endpoints"
+                    "name": "API Endpoints",
+                    "contextualTitle": "API Endpoints (Avalara)"
                 },
                 {
                     "id": "definition-models",
-                    "name": "Models"
+                    "name": "Models",
+                    "contextualTitle": "Models (Avalara)"
+                }
+            ]
+        },
+        "menus": {
+            "view/item/context": [
+                {
+                    "command": "model.example.launch",
+                    "when": "viewItem == definitionmodel",
+                    "group": "inline"
+                },
+                {
+                    "command": "endpoint.addtofavourites",
+                    "when": "viewItem == endpoint",
+                    "group": "inline"
+                },
+                {
+                    "command": "endpoint.removefromfavourites",
+                    "when": "viewItem == favouriteEndpoint",
+                    "group": "inline"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "endpoint.launch",
+                    "group": "navigation",
+                    "when": "view == api-endpoints"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "endpoint.addtofavourites",
+                    "when": "false"
+                },
+                {
+                    "command": "endpoint.removefromfavourites",
+                    "when": "false"
+                },
+                {
+                    "command": "favouriteendpointsview.refresh",
+                    "when": "false"
                 }
             ]
         },
         "viewsWelcome": [
             {
                 "view": "avatax-api-explorer",
-                "contents": "No endpoint found, or Swagger.json not loaded properly."
+                "contents": "No endpoints found. Swagger.json may not have loaded properly."
             }
         ],
         "customEditors": [
             {
                 "viewType": "endpoint.request",
                 "displayName": "Request",
-                "priority": "default",
-                "selector": []
-            },
-            {
-                "viewType": "endpoint.model",
-                "displayName": "Model",
                 "priority": "default",
                 "selector": []
             }
