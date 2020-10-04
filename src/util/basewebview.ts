@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { makeRequest } from '../controllers/RequestController';
 import { copyResponseBody, saveResponseBody, generateSnippet } from '../helpers/responseHelper';
-import { showRequiredFieldsError, launchModel } from '../util/requestPanelClient';
+import { launchModel, copyRequestBody, resetRequestBody } from '../util/requestPanelClient';
 import { AVConstants } from './avconstants';
 
 /** Local constants */
@@ -151,7 +151,7 @@ const createWebView = (title: string): vscode.WebviewPanel => {
         }
     });
 
-    webViewPanel.webview.onDidReceiveMessage((message) => {
+    webViewPanel.webview.onDidReceiveMessage(async (message) => {
         const action = message.action || '';
         if (!!action) {
             switch (action) {
@@ -170,9 +170,20 @@ const createWebView = (title: string): vscode.WebviewPanel => {
                 case 'save':
                     saveResponseBody();
                     break;
-                case 'requiredfields':
-                    showRequiredFieldsError();
+                case 'copy_request_body':
+                    copyRequestBody(message.reqBody);
                     break;
+                case 'reset_request_body':
+                    const requestBodyJson = await resetRequestBody(message.modelName, message.isModelArrayOfItems);
+                    if (!!requestBodyJson) {
+                        webViewPanel.webview.postMessage({ command: 'request_body_reset', reqBody: requestBodyJson });
+                    }
+                    break;
+                case 'show_information_message':
+                    vscode.window.showInformationMessage(message.data.msg);
+                    break;
+                case 'show_error_message':
+                    vscode.window.showErrorMessage(message.data.msg);
                 default:
                     break;
             }

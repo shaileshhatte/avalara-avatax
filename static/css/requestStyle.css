@@ -68,7 +68,7 @@ input {
 }
 
 .monospace {
-    font-family: Input, menlo, lucida console, monospace;
+    font-family: var(--vscode-editor-font-family);
 }
 
 .btn-send {
@@ -104,11 +104,17 @@ input {
 
 .model-label {
     float: right;
+    color: var(--vscode-descriptionForeground);
+}
+
+.model-label a {
+    font-family: var(--vscode-editor-font-family);
 }
 
 a {
     color: var(--vscode-descriptionForeground);
-    letter-spacing: 0.05rem;
+    letter-spacing: 0.005rem;
+    text-decoration: none;
 }
 
 a:hover,
@@ -140,4 +146,24 @@ a:active {
 .vscode-dark textarea {
     background-color: #3c3c3c;
     color: var(--vscode-editor-foreground);
+}
+
+.body-action-links {
+    float: right;
+}
+
+.body-action-links a {
+    text-decoration: none;
+}
+
+.body-action-links a {
+    color: var(--vscode-descriptionForeground);
+}
+
+.body-action-links a:hover {
+    color: var(--vscode-editor-foreground);
+}
+
+.cursor-help {
+    cursor: help;
 }

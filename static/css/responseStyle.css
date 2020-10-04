@@ -3,7 +3,7 @@ body {
 }
 
 .monospace {
-    font-family: input, menlo, lucida console, monospace;
+    font-family: var(--vscode-editor-font-family);
 }
 
 /** Header label ********************

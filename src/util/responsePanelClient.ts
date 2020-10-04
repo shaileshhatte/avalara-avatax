@@ -25,7 +25,7 @@ export function responseBodyAsHtml(data: string, contentType: string): string {
     } else if (contentType.indexOf('json') >= 0) {
         formattedData = prettyPrintJson.toHtml(data, {
             quoteKeys: true,
-            indent: 3
+            indent: 2
         });
 
         formattedData = `<pre id='response-body' class='monospace response-body'>${formattedData}</pre>`;

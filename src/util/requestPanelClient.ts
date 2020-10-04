@@ -5,6 +5,7 @@ import * as nonceutil from '../util/nonceutil';
 const prettyPrintJson = require('pretty-print-json');
 import { convertSchemaToJson } from '../helpers/requestJsonGenerator';
 import { generateDefinitionQuickPickItems } from '../providers/definitionsProvider';
+import { requestBodyAsJson } from '../helpers/requestGenerator';
 
 /**
  * Provides content for head tag inside HTML page.
@@ -47,14 +48,6 @@ export function getScriptContent(nonce: string): string {
 }
 
 /**
- * Show error message notification in case there are any required fields left empty
- */
-export function showRequiredFieldsError() {
-    vscode.window.showErrorMessage(`Please provide values for all required fields.`);
-    return;
-}
-
-/**
  * Launches a model view panel for provided model name
  * @param data Data received from the request panel - contains 'model' property with model name
  */
@@ -65,7 +58,7 @@ export async function launchModel(fromLink?: boolean, data?: any, onlyModel?: bo
     // If arguments.length is Zero – launched via command palette. show options.
     if (!arguments || !arguments.length) {
         modelName = await getModelNameFromQuickPick();
-        onlyModel = false;
+        onlyModel = true;
     } else {
         if (fromLink && data) {
             modelName = data.model.trim() || ''; // Launched  via model link on request body
@@ -94,7 +87,7 @@ export async function launchModel(fromLink?: boolean, data?: any, onlyModel?: bo
         if (panel) {
             let formattedData = prettyPrintJson.toHtml(modelData, {
                 quoteKeys: true,
-                indent: 3
+                indent: 2
             });
 
             formattedData = `<pre id='model-body' class='monospace model-body'>${formattedData}</pre>`;
@@ -152,4 +145,56 @@ async function getModelNameFromQuickPick(): Promise<string> {
         vscode.window.showErrorMessage(err);
     }
     return modelName;
+}
+
+/**
+ * Copies request body content to clipboard
+ * @param reqBody Request body content at the time of copy action
+ */
+export function copyRequestBody(reqBody: any) {
+    if (!reqBody) {
+        vscode.window.showInformationMessage(`No request body content found for copying.`);
+        return;
+    }
+    try {
+        const clipboard: vscode.Clipboard = vscode.env.clipboard;
+        if (clipboard) {
+            clipboard.writeText(reqBody).then(() => {
+                vscode.window.showInformationMessage('Request body copied to clipboard.');
+            });
+        } else {
+            vscode.window.showErrorMessage('Error: Clipboard may not be accessible.');
+        }
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
+}
+
+export async function resetRequestBody(model: string, isModelArrayOfItems: string) {
+    if (!model) {
+        vscode.window.showInformationMessage(`Invalid request model.`);
+        return;
+    }
+    const selection = await vscode.window.showInformationMessage(
+        `Are you sure you want to reset request body?`,
+        {
+            title: `Yes, I'm sure`,
+            id: `yes`
+        },
+        {
+            title: `No`,
+            id: `no`
+        }
+    );
+    if (selection?.id !== `yes`) {
+        return undefined;
+    }
+    try {
+        const requestBodyJson = isModelArrayOfItems === 'true' ? '[' + requestBodyAsJson(model) + ']' : requestBodyAsJson(model);
+        return requestBodyJson || ``;
+    } catch (err) {
+        console.error(err);
+        vscode.window.showErrorMessage(err);
+    }
 }

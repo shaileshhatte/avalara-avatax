@@ -53,11 +53,11 @@ function generateEndpointDescription(): string {
 
     htmlContent += `	<br>
 						<div class='description-section'>
-							<p><a href='#' title='Show/Hide Endpoint Description' id='description-show-link' class='description-show-link'>Show Description</a></p>
+							<p><a href='javascript:void(0)' title='Show/Hide Endpoint Description' id='description-show-link' class='description-show-link'>Show Description</a></p>
 							<div id='description-div' class='description-div'>
 								<p class='bold-text'>DESCRIPTION</p>
 								<div id='endpoint-description' class='endpoint-description'>
-									${endpoint?.description || 'Description not available'}
+									${endpoint?.description || '<i>Description unavailable.</i>'}
 								</div>
 							</div>
 						</div>
@@ -156,7 +156,7 @@ function getEditableParametersContent(editableParametersMap: Map<string, Paramet
 
                 htmlContent += `<tr>
 									<td>
-										<span class='param-name monospace' title='${param.description}'>${param.name} ${param.required ? '<span class="required-flag">(Required)' : ''}</span>
+										<span class='param-name monospace cursor-help' title='${param.description}'>${param.name} ${param.required ? '<span class="required-flag">(Required)' : ''}</span>
 									</td>
 									<td class='input-background'>
 										<input data-type='${location}' data-paramname='${param.name}' class='input-${param.required.toString()} input-${param.inLocation} input-rounded-border monospace input-box' type='${inputType}' required=${param.required} placeholder='${
@@ -187,13 +187,22 @@ function getRequestBodyHtml(model: string, isModelArrayOfItems: boolean, isModel
 							<td colspan='2'><span class='heading'>
 								<div>
 									<span class='bold-text' title='Request Body'>BODY ${isModelBodyRequired ? '<span class="required-flag"> (Required)</span>' : ''}</span>
-									<span class='model-label'><a href='#' id='model-link' title='Click to view this model'>${model || ''}</a></span>
+									<span class='model-label'>{ <a href='javascript:void(0)' id='model-link' title='Click to view model definition'>${model || ''}</a> }</span>
 								</div>
+							</td>
+                        </tr>
+                        <tr class=''>
+							<td colspan='2' class=''>
+                                <div class='body-action-links'>
+                                    <span class='body-action-label cursor-help'><a href='javascript:void(0)' id='copy-body' title='Copies request body to clipboard'>Copy &nbsp;</a></span>
+                                    <span class='body-action-label cursor-help'><a href='javascript:void(0)' id='reset-body' title='Resets request body example'>Reset &nbsp;</a></span>
+                                    <span class='body-action-label cursor-help'><a href='javascript:void(0)' id='prettify-body' title='Formats request body'>Prettify</a></span>
+                                </div>
 							</td>
 						</tr>
 						<tr class='textarea-tr'>
 							<td colspan='2' class='request-body td-center'>
-								<textarea id='request-body' class='monospace' rows='40' cols='100' data-model='${model}'>${requestBodyJson}</textarea>
+								<textarea id='request-body' class='monospace' rows='40' cols='100' data-isModelArrayOfItems='${isModelArrayOfItems}' data-model='${model}'>${requestBodyJson}</textarea>
 							</td>
 						</tr>
 					`;
@@ -209,13 +218,13 @@ function getRequestBodyHtml(model: string, isModelArrayOfItems: boolean, isModel
  * Generates a JSON example request body based on gived model
  * @param model Model for which JSON example body is to be generated
  */
-function requestBodyAsJson(model: string): string {
+export function requestBodyAsJson(model: string): string {
     let requestContent: string = '';
     let formattedJson: string = '';
 
     try {
         requestContent = requestJsonGenerator.convertSchemaToJson(model);
-        formattedJson = JSON.stringify(requestContent, null, 3).trim();
+        formattedJson = JSON.stringify(requestContent, null, 2).trim();
     } catch (err) {
         console.error(err);
     }

@@ -19,7 +19,8 @@
         "onCommand:avatax.setup",
         "onCommand:model.example.launch",
         "onCommand:endpoint.addtofavourites",
-        "onCommand:endpoint.removefromfavourites"
+        "onCommand:endpoint.removefromfavourites",
+        "onCommand:model.launch"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -48,7 +49,6 @@
             {
                 "command": "model.example.launch",
                 "title": "View Model Example",
-                "category": "Avalara",
                 "icon": "$(json)"
             },
             {
@@ -64,6 +64,12 @@
             {
                 "command": "favouriteendpointsview.refresh",
                 "title": "Refresh Favourites Tree View"
+            },
+            {
+                "command": "model.launch",
+                "title": "View Model Definition",
+                "category": "Avalara",
+                "icon": "$(search)"
             }
         ],
         "viewsContainers": {
@@ -80,7 +86,7 @@
                 {
                     "id": "favourite-endpoints",
                     "name": "Favourites",
-                    "contextualTitle": "Favourites (Avalara)",
+                    "contextualTitle": "Favourite Endpoints (Avalara)",
                     "icon": "$(star-full)"
                 },
                 {
@@ -118,6 +124,11 @@
                     "command": "endpoint.launch",
                     "group": "navigation",
                     "when": "view == api-endpoints"
+                },
+                {
+                    "command": "model.launch",
+                    "group": "navigation",
+                    "when": "view == definition-models"
                 }
             ],
             "commandPalette": [
@@ -131,6 +142,10 @@
                 },
                 {
                     "command": "favouriteendpointsview.refresh",
+                    "when": "false"
+                },
+                {
+                    "command": "model.example.launch",
                     "when": "false"
                 }
             ]

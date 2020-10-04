@@ -1,19 +1,19 @@
 .monospace {
-	font-family: input, menlo, lucida console, monospace;
+    font-family: var(--vscode-editor-font-family);
 }
 
 textarea {
-	width: 100%;
-	max-width: 1000px;
-	min-width: 400px;
-	height: 1000px;
-	min-height: 400px;
-	max-height: 1000px;
-	font-size: var(--vscode-font-size);
-	background-color: transparent;
-	color: var(--vscode-editor-foreground);
-	line-height: 18px;
-	letter-spacing: 0.05rem;
-	padding: 5px;
-	border: var(--vscode-input-border);
+    width: 100%;
+    max-width: 1000px;
+    min-width: 400px;
+    height: 1000px;
+    min-height: 400px;
+    max-height: 1000px;
+    font-size: var(--vscode-font-size);
+    background-color: transparent;
+    color: var(--vscode-editor-foreground);
+    line-height: 18px;
+    letter-spacing: 0.05rem;
+    padding: 5px;
+    border: var(--vscode-input-border);
 }
