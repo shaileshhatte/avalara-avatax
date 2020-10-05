@@ -134,7 +134,7 @@ async function getModelNameFromQuickPick(): Promise<string> {
     try {
         let definitionQuickPickItems = generateDefinitionQuickPickItems();
         const pickedItem = await vscode.window.showQuickPick(definitionQuickPickItems, {
-            placeHolder: `Select a model to view its example`
+            placeHolder: `Select a model to view its definition`
         });
 
         if (pickedItem) {

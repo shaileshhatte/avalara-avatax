@@ -1,3 +1,6 @@
+/**
+ * @author Shailesh Hatte
+ */
 import * as vscode from 'vscode';
 import { addToFavourites, EndPointsProvider } from './providers/endpointsProvider';
 import { launchEndpoint, launchTaxCalculationEndpoint, launchAddressCalculationEndpoint } from './helpers/requestLauncher';
@@ -6,6 +9,7 @@ import { launchModel } from './util/requestPanelClient';
 import { AvaWebView } from './util/basewebview';
 import { setupAvataxCredentials, deleteCredentials } from './util/authenticator';
 import { FavouriteEndPointsProvider, removeFromFavourites } from './providers/favouritesProvider';
+import { generateTypeScriptModel } from './helpers/definitionsHelper';
 
 /**
  * A function that's invoked when the extension is activated.
@@ -49,6 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
     const modelLaunchDisposable = vscode.commands.registerCommand('model.launch', launchModel);
     const modelExampleGenerateDisposable = vscode.commands.registerCommand('model.example.launch', launchModel);
+    const tsModelGenerateDisposable = vscode.commands.registerCommand('model.generate.tsmodel', generateTypeScriptModel);
 
     // Command - tax calculation
     const epTaxLaunchDisposable = vscode.commands.registerCommand('taxendpoint.launch', launchTaxCalculationEndpoint);
@@ -71,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 }
 
-// this method is called when your extension is deactivated
+// this method is called when the extension is deactivated
 export function deactivate() {
     // Delete account credentials from the system keychain
     deleteCredentials();

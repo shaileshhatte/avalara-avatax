@@ -2,8 +2,11 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EndpointMethod } from '../models/EndpointMethod';
-import * as swaggerJson from '../data/swagger.json';
+
 import * as favouriteEndpointsJson from '../data/favouriteEndpoints.json';
+import { readSwaggerJson } from '../util/swagger';
+
+const swaggerJson: any = readSwaggerJson();
 
 let tags: string[] = [];
 let endpoints: Map<string, EndpointMethod[]> = new Map();

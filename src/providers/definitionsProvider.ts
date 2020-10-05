@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
-import * as swaggerJson from '../data/swagger.json';
+import { readSwaggerJson } from '../util/swagger';
+// import * as swaggerJson from '../data/swagger.json';
+const swaggerJson: any = readSwaggerJson();
 
 /**
  * Class that facilitates a tree item for model definition under model definitions tree view

@@ -1,5 +1,7 @@
 import { window } from 'vscode';
-import * as swaggerJson from '../data/swagger.json';
+import { readSwaggerJson } from '../util/swagger';
+// import * as swaggerJson from '../data/swagger.json';
+const swaggerJson: any = readSwaggerJson();
 
 const definitions: any = swaggerJson.definitions;
 

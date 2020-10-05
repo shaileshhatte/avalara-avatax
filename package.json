@@ -1,13 +1,23 @@
 {
     "name": "avalara-avatax",
     "displayName": "Avalara AvaTax",
-    "description": "",
+    "description": "AvaTax API Explorer",
     "version": "0.0.1",
+    "author": {
+        "email": "shailesh.hatte@avalara.com",
+        "name": "Shailesh Hatte"
+    },
     "engines": {
         "vscode": "^1.49.0"
     },
     "categories": [
         "Other"
+    ],
+    "keywords": [
+        "avalara",
+        "avatax",
+        "rest",
+        "tax"
     ],
     "activationEvents": [
         "onView:api-endpoints",
@@ -20,7 +30,8 @@
         "onCommand:model.example.launch",
         "onCommand:endpoint.addtofavourites",
         "onCommand:endpoint.removefromfavourites",
-        "onCommand:model.launch"
+        "onCommand:model.launch",
+        "onCommand:model.generate.tsmodel"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -70,6 +81,11 @@
                 "title": "View Model Definition",
                 "category": "Avalara",
                 "icon": "$(search)"
+            },
+            {
+                "command": "model.generate.tsmodel",
+                "title": "Generate TypeScript Interface",
+                "category": "Avalara"
             }
         ],
         "viewsContainers": {
@@ -107,6 +123,10 @@
                     "command": "model.example.launch",
                     "when": "viewItem == definitionmodel",
                     "group": "inline"
+                },
+                {
+                    "command": "model.generate.tsmodel",
+                    "when": "viewItem == definitionmodel"
                 },
                 {
                     "command": "endpoint.addtofavourites",
@@ -223,6 +243,8 @@
         "httpsnippet": "^1.22.0",
         "js-base64": "^3.4.5",
         "json-beautify": "^1.1.1",
+        "json-schema-ref-parser": "^9.0.6",
+        "json-schema-to-typescript": "^9.1.1",
         "keytar": "^6.0.1",
         "pretty-print-json": "^0.2.2",
         "xml-formatter": "^2.1.3"
