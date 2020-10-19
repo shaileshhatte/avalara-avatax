@@ -226,6 +226,7 @@
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
+        "@types/form-data": "^2.5.0",
         "@types/glob": "^7.1.1",
         "@types/mocha": "^7.0.2",
         "@types/node": "^13.11.0",
@@ -240,6 +241,7 @@
     },
     "dependencies": {
         "axios": "^0.19.2",
+        "form-data": "^3.0.0",
         "httpsnippet": "^1.22.0",
         "js-base64": "^3.4.5",
         "json-beautify": "^1.1.1",

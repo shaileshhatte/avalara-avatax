@@ -4,7 +4,7 @@ import { createAxiosConfig } from '../service/requestFactory';
 
 /** Local constants */
 const MISSING_CONTENT: string = `Missing request content.`;
-const PROBLEM_CONTRUCTING_REQUEST: string = `Problem constructing the request.`;
+const PROBLEM_CONSTRUCTING_REQUEST: string = `Problem constructing the request.`;
 const INVALID_REQ_BODY: string = 'Invalid Request Body.';
 
 /**
@@ -21,7 +21,7 @@ export async function makeRequest(data: any): Promise<void> {
             if (axiosConfig) {
                 sendRequest(axiosConfig);
             } else {
-                throw new Error(PROBLEM_CONTRUCTING_REQUEST);
+                throw new Error(PROBLEM_CONSTRUCTING_REQUEST);
             }
         } catch (err) {
             vscode.window.showErrorMessage(INVALID_REQ_BODY);

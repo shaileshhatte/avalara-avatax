@@ -39,7 +39,7 @@ export function responseBodyAsHtml(data: string, contentType: string): string {
                             <input id='btn-save' class='btn-save' type='button' value='Save'/>
                         </div>
                         <br>
-						<div id='res-body'>
+						<div id='res-body' class='res-body'>
 							${formattedData}
 						</div>
                     </div>

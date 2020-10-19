@@ -128,7 +128,6 @@ async function constructSnippet(lang: string, fileExtension: string, library?: s
         };
 
         const snippet = new HTTPSnippet(har);
-
         let convertedSnippet: string = '';
 
         if (library) {
@@ -148,7 +147,7 @@ async function constructSnippet(lang: string, fileExtension: string, library?: s
         const htmlContent = convertedSnippet;
 
         try {
-            /** Show generated code a file */
+            /** Show generated code in a file */
             const filename: string = `untitled${fileExtension || '.txt'}`;
             const uri: vscode.Uri = vscode.Uri.file(path.join(__dirname, `../../temp/`, filename));
 

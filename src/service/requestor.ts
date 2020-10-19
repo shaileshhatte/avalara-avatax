@@ -6,6 +6,9 @@ const axios = axiosModule.default;
 // script imports
 import { processResponse } from '../helpers/responseHelper';
 
+/** Local constants */
+const REQUEST_IN_PRGRESS: string = `Request in progress...`;
+
 /**
  * Sends an API request to AvaTax.
  * Upon receiving the response, hands it over to `processResponse` method to process.
@@ -17,19 +20,18 @@ export function sendRequest(axiosConfig: axiosModule.AxiosRequestConfig) {
             {
                 location: vscode.ProgressLocation.Notification,
                 cancellable: false,
-                title: `Request in progress...`
+                title: REQUEST_IN_PRGRESS
             },
-            () => {
-                return axios(axiosConfig)
-                    .then((res) => {
-                        processResponse(res);
-                    })
-                    .catch((err) => {
-                        processResponse(err);
-                    });
+            async () => {
+                try {
+                    const res = await axios(axiosConfig);
+                    processResponse(res);
+                } catch (err) {
+                    processResponse(err);
+                }
             }
         );
-    } catch (err) {
-        vscode.window.showErrorMessage(err);
+    } catch (error) {
+        vscode.window.showErrorMessage(error);
     }
 }

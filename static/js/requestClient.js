@@ -135,7 +135,7 @@
         for (let i = 0; i < requiredInputFields.length; i++) {
             let ipField = requiredInputFields[i];
             if (!ipField.value.toString().trim()) {
-                showMessageToWindow('error', 'Please fill all mandatory fields.');
+                showMessageToWindow('error', 'Please fill all required fields.');
                 return;
             }
         }
@@ -201,6 +201,23 @@
             queryValues[paramName] = paramValue;
         }
 
+        let fileInputBoxes = document.getElementsByClassName('input-formData');
+        let filePath = '';
+        if (fileInputBoxes) {
+            let fileInputBox = fileInputBoxes[0];
+            if (fileInputBox) {
+                let file = fileInputBox.files ? fileInputBox.files[0] : ''; // value represents the path of the first file selected
+                filePath = file.path;
+            }
+        }
+
+        // Extract 'Accept' header
+        let accepts = [];
+        let produces = btnSend.getAttribute('data-accepts');
+        if (produces) {
+            accepts = produces.split(',');
+        }
+
         vscode.postMessage({
             action: 'send',
             data: {
@@ -211,7 +228,9 @@
                 parameters: {
                     headervalues: headerValues,
                     queryvalues: queryValues,
-                    pathvalues: pathValues
+                    pathvalues: pathValues,
+                    filePath: filePath,
+                    accepts: accepts
                 }
             }
         });

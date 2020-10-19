@@ -32,11 +32,11 @@ function generateTitleButtonsHtml(): string {
         if (!endpoint) {
             return '';
         }
-        const urlLabelClipped = endpoint.urlLabel.length >= 80 ? endpoint.urlLabel.substr(0, 75) + '...' : endpoint.urlLabel;
+        const urlLabelClipped = endpoint.urlLabel.length >= 60 ? endpoint.urlLabel.substr(0, 60) + '...' : endpoint.urlLabel;
         const endpointLabelClipped = `${endpoint.method.toUpperCase()} ${urlLabelClipped}`;
         htmlContent += `<div>
 							<span class='endpoint-label' title='${endpoint.urlLabel}'>${endpointLabelClipped || ''}</span>
-							<input id='btn-send' class='btn-send' type='button' value='Send Request'/>
+							<input id='btn-send' class='btn-send' type='button' value='Send Request' data-accepts='${endpoint.produces}'/>
 						</div>
 					`;
     } catch (err) {
@@ -86,7 +86,7 @@ function generateRequestContent(): string {
         let isModelBodyRequired: boolean = false;
 
         parameters.forEach((param: any) => {
-            let paramModel = new Parameter(param.name || '', param.in || '', param.description || '', param.required || false, param.schema, param.format, param.default);
+            let paramModel = new Parameter(param.name || '', param.in || '', param.description || '', param.required || false, param.type || '', param.schema, param.format, param.default);
             if (!!paramModel.schema && paramModel.inLocation === 'body') {
                 pathHasSchema = !pathHasSchema;
                 schemaRef = paramModel.schema['$ref'] || paramModel.schema[`items`][`$ref`];
@@ -137,17 +137,35 @@ function getEditableParametersContent(editableParametersMap: Map<string, Paramet
 						</tr>
 						`;
             parametersArray.forEach((param: Parameter) => {
-                let inputType: string = '';
+                let inputType: string = 'text';
 
-                switch (param.format) {
+                const paramName: string = param.name || ``;
+                const paramDescription: string = param.description || ``;
+                let paramValue: any = param.defaultValue || '';
+                const isParamRequired: boolean = !!param.required;
+                const paramInlocation: string = param.inLocation;
+                const headerDisabledForXAvalaraClient: boolean = paramName === `X-Avalara-Client` && paramInlocation === `header`;
+
+                let acceptedInputFileExtensions = '';
+
+                switch (param.type) {
                     case 'string':
-                        inputType = 'text';
+                        if (param.format === 'date-time') {
+                            paramValue = `2020-06-01T08:30Z`;
+                        }
+                        inputType = `text`;
                         break;
-                    case 'int32':
+                    case 'integer':
                         inputType = 'number';
                         break;
                     case 'date-time':
-                        inputType = 'datetime';
+                        // inputType = 'datetime-local';
+                        inputType = `text`;
+                        paramValue = `2020-06-01T08:30Z`;
+                        break;
+                    case 'file':
+                        inputType = 'file';
+                        acceptedInputFileExtensions = `accept='.pdf, .jpeg, .tiff, .png'`;
                         break;
                     default:
                         inputType = 'text';
@@ -156,12 +174,14 @@ function getEditableParametersContent(editableParametersMap: Map<string, Paramet
 
                 htmlContent += `<tr>
 									<td>
-										<span class='param-name monospace cursor-help' title='${param.description}'>${param.name} ${param.required ? '<span class="required-flag">(Required)' : ''}</span>
+										<span class='param-name monospace cursor-help' title='${paramDescription}'>${paramName} ${isParamRequired ? '<span class="required-flag">(Required)' : ''}</span>
 									</td>
 									<td class='input-background'>
-										<input data-type='${location}' data-paramname='${param.name}' class='input-${param.required.toString()} input-${param.inLocation} input-rounded-border monospace input-box' type='${inputType}' required=${param.required} placeholder='${
-                    param.defaultValue || inputType
-                }' value='${param.defaultValue || ''}'>
+										<input ${acceptedInputFileExtensions} ${
+                    !!headerDisabledForXAvalaraClient ? 'disabled' : ''
+                } data-type='${location}' data-paramname='${paramName}' class='input-${isParamRequired.toString()} input-${paramInlocation} input-rounded-border monospace input-box' type='${inputType}' required=${isParamRequired} placeholder='${inputType}' value='${
+                    paramValue || ''
+                }'>
 									</td>
 							</tr>
 							`;
@@ -187,7 +207,7 @@ function getRequestBodyHtml(model: string, isModelArrayOfItems: boolean, isModel
 							<td colspan='2'><span class='heading'>
 								<div>
 									<span class='bold-text' title='Request Body'>BODY ${isModelBodyRequired ? '<span class="required-flag"> (Required)</span>' : ''}</span>
-									<span class='model-label'>{ <a href='javascript:void(0)' id='model-link' title='Click to view model definition'>${model || ''}</a> }</span>
+									<span class='model-label'>{ <a href='javascript:void(0)' id='model-link' title='View model definition'>${model || ''}</a> }</span>
 								</div>
 							</td>
                         </tr>

@@ -1,9 +1,11 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+    font-size: var(--vscode-font-size);
 }
 
 .monospace {
     font-family: var(--vscode-editor-font-family);
+    font-size: var(--vscode-editor-font-size);
 }
 
 /** Header label ********************
@@ -73,7 +75,7 @@ textarea:focus {
     float: right;
     width: 160px;
     height: 100%;
-    margin: 2px 0 8px 0;
+    margin: 20px 0 8px 90px;
     background-color: var(--vscode-button-background);
     color: var(--vscode-button-foreground);
     border-radius: 2px;
@@ -86,12 +88,18 @@ textarea:focus {
     cursor: pointer;
 }
 
+.request-details p {
+    margin-bottom: 0;
+    color: #abad48;
+}
+
 .action-buttons-div {
     float: right;
 }
 
 .res-body {
     margin-top: 30px;
+    line-height: 1.35rem;
 }
 
 .resppnse-body {
@@ -129,6 +137,10 @@ textarea:focus {
 #icons .icon .codicon {
     font-size: 32px;
     padding-bottom: 16px;
+}
+
+.request-method-url {
+    display: inline-block;
 }
 
 /************ Response JSON – For Dark and High Constrast themes *****/

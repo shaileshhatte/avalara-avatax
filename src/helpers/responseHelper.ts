@@ -15,6 +15,7 @@ let contentDisposition: any = {};
  */
 export async function processResponse(result: any) {
     svcResult = result.isAxiosError ? result.response : result;
+    console.log(svcResult);
     contentType = ``;
     contentDisposition = {
         attachment: false,
@@ -92,7 +93,7 @@ function generateResponseHtml(result: AxiosResponse): string {
     const headTagContent = getHeadTagContent();
     const scriptTagContent = getScriptTagContent();
 
-    console.log(result);
+    //console.log(result);
 
     try {
         htmlContent += `<html> 
@@ -121,20 +122,27 @@ function getResponseHeaderContent(result: AxiosResponse): string {
     let htmlContent: string = '';
 
     try {
-        const baseUrl: string = result.request.res.responseUrl || 'NA';
-        const responseStatus: string = `${result.status} ${result.statusText}`;
+        const requestMethodUrl: string = `${result.request.method || ''} ${result.request.path}`;
+        const baseUrl: string = result.request.res.responseUrl || '';
         const headersObject = result.headers;
-        const rawHeaders = result.request ? result.request.res['rawHeaders'] : [];
+        const rawHeaders = !!result.request ? result.request.res['rawHeaders'] : [];
 
         let requestHeadersHTML: string = '';
         let requestHeaders: any = {};
 
+        // Set headers
+        // requestHeaders['key'] = 'value';
+        requestHeaders[`statusCode`] = result.request.res[`statusCode`] || ``;
+        requestHeaders[`statusMessage`] = result.request.res[`statusMessage`] || ``;
+        requestHeaders[`httpVersion`] = result.request.res[`httpVersion`] || ``;
+
+        // Set other important headers
         if (rawHeaders) {
             for (let i = 0; i < rawHeaders.length; i++) {
                 if (i % 2 === 0) {
                     requestHeaders[rawHeaders[i].toString().trim()] = rawHeaders[i + 1].toString().trim() || '-';
                 }
-                continue;
+                //continue;
             }
         }
 
@@ -151,24 +159,19 @@ function getResponseHeaderContent(result: AxiosResponse): string {
         contentType = headersObject['content-type'];
         const location: string = headersObject.location || '';
 
-        htmlContent += `<table class='request-url-table'>
-						<tr>
-							<td>
-								<span class='request-url-label'>Request URL:</span>
-							</td>
-							<td>
-								<input id='btn-generate-code-snippet' class='btn-generate-code-snippet' type='button' value='Generate Code Snippet'/>
-							</td>
-						</tr>
-						<tr>
-							<td colspan='2'><span class='base-url'>${baseUrl}</span></td>
-						</tr>
-					</table>
-				
-					<div id='header-div' class='header-div'>
-						<p>${location} ${responseStatus}</p>
-						${requestHeadersHTML}
-					</div>
+        // <input id='btn-generate-code-snippet' class='btn-generate-code-snippet' type='button' value='Generate Code Snippet'/>
+        // <p class='btn-generate-code-snippet'><a id='btn-generate-code-snippet' href='#'>Generate Code Snippet</a></p>
+
+        htmlContent += `
+                        <div class='request-details'>
+                            <p class="request-method-url">${requestMethodUrl}</p>
+                            <p>${baseUrl}</p>
+                        </div>
+                        <input id='btn-generate-code-snippet' class='btn-generate-code-snippet' type='button' value='Generate Code Snippet'/><br>
+                     
+                        <div id='header-div' class='header-div'>
+                            <div class='headers-data'>${requestHeadersHTML}</div>
+                        </div>
 					`;
     } catch (err) {
         console.error(err);
@@ -203,10 +206,8 @@ export async function saveResponseBody() {
     let filters: any = {};
     try {
         let fullResponse: string = svcResult.data || svcResult.statusText;
-
         const headersObject = svcResult.headers;
         contentType = headersObject['content-type'];
-
         let ext: string = '.json';
         if (contentType.indexOf('json') >= 0) {
             filters['JSON'] = [ext];
@@ -219,9 +220,7 @@ export async function saveResponseBody() {
             filters['HTML'] = ['.html', '.htm'];
             filters['Text'] = ['.txt'];
         }
-
         const filename: string = !!contentDisposition.filename ? contentDisposition.filename : `untitled${ext}`;
-
         const uri = await vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(filename) });
         if (uri) {
             const filePath = uri.fsPath;
@@ -238,7 +237,9 @@ export async function saveResponseBody() {
         vscode.window.showErrorMessage(err);
     }
 }
-
-export function generateSnippet() {
+/**
+ * Handler for generating code snippets.
+ */
+export function generateSnippet(): void {
     genSnippet(svcResult);
 }

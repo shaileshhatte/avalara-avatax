@@ -1,8 +1,11 @@
 import * as axiosModule from 'axios';
 import { getATConfiguration, getATLicenseKey } from '../util/configurationProvider';
 import { Base64 } from 'js-base64';
-import { window } from 'vscode';
+import { Uri, window, workspace } from 'vscode';
 import { AVConstants } from '../util/avconstants';
+const FormData = require('form-data');
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Request Config constants
 let ACCOUNT_NUMBER: string = '';
@@ -15,13 +18,32 @@ let BASE_URL: string = '';
 let endpointUrl: string = '';
 
 /**
+ * Creates axios request configuration
+ * @param data Request data
+ */
+export async function createAxiosConfig(data: any): Promise<AxiosConfiguration | undefined> {
+    let requestConfiguration: AxiosConfiguration | undefined;
+    try {
+        await setATSettings();
+        if (data) {
+            requestConfiguration = new AxiosConfiguration(data);
+        }
+    } catch (err) {
+        console.error(err);
+        window.showErrorMessage(err);
+    }
+    return requestConfiguration;
+}
+
+/**
  * Class that templates AxiosRequestConfig for generating request config
  */
 class AxiosConfiguration implements axiosModule.AxiosRequestConfig {
     url: string;
     baseURL: string = BASE_URL;
     data: any;
-    headers: any;
+    headers: any = {};
+    formData: any;
     method: 'get' | 'GET' | 'delete' | 'DELETE' | 'head' | 'HEAD' | 'options' | 'OPTIONS' | 'post' | 'POST' | 'put' | 'PUT' | 'patch' | 'PATCH' | 'link' | 'LINK' | 'unlink' | 'UNLINK' | undefined;
     params: any;
     timeout: number;
@@ -32,27 +54,63 @@ class AxiosConfiguration implements axiosModule.AxiosRequestConfig {
      * @param endpointUrl Endpoint URL. If provided url property from the data object is ignored.
      */
     constructor(data: any) {
+        // If there is a file to be uploaded
+        if (!!data.parameters.filePath) {
+            // const fileUri = Uri.file(data.parameters.filePath);
+            // console.log(fileUri);
+            // const form = new FormData();
+            // form.append('file', fs.createReadStream(path.resolve(data.parameters.filePath)));
+
+            const content = fs.readFileSync(path.resolve(data.parameters.filePath), {
+                encoding: `base64`
+            });
+
+            // console.log(content);
+
+            this.data = {
+                file: content
+            };
+
+            this.headers['Content-Type'] = 'multipart/form-data';
+            // this.headers = form.getHeaders() ? form.getHeaders() : {};
+        }
         this.url = generateEndpointUrl(data);
         this.data = data.reqbody ? (data.reqbody !== `NA` ? JSON.parse(data.reqbody) : ``) : ``;
-        this.headers = data.parameters?.headervalues ? data.parameters?.headervalues : {};
-        this.headers = getHeaders(data.parameters?.headervalues || undefined);
+        // If there is a file to be uploaded
+        if (!!data.parameters.filePath) {
+            // const fileUri = Uri.file(data.parameters.filePath);
+            // console.log(fileUri);
+            const form = new FormData();
+            form.append('file', fs.createReadStream(path.resolve(data.parameters.filePath)));
+            this.data = form;
+            this.headers = form.getHeaders() ? form.getHeaders() : {};
+        }
+
+        // Set headers
+        if (data.parameters?.headervalues) {
+            const headerObject = data.parameters?.headervalues;
+            Object.keys(headerObject).forEach((key) => {
+                this.headers[key] = headerObject[key];
+            });
+        }
+        this.headers[`Authorization`] = `Basic ${Base64.encode(ACCOUNT_NUMBER + ':' + LICENSE_KEY)}`;
+
+        if (data.parameters?.accepts && !data.parameters.filePath) {
+            const acceptsArray: string[] = data.parameters?.accepts;
+            let acceptsString: string = '';
+            acceptsArray.forEach((item, index) => {
+                acceptsString += item;
+                if (index < acceptsArray.length - 1) {
+                    acceptsString += `;`;
+                }
+            });
+            this.headers[`Accept`] = acceptsString;
+        }
+
         this.method = data.method ? data.method : ``;
         this.params = data.parameters?.queryvalues ? data.parameters?.queryvalues : {};
         this.timeout = REQUEST_TIMEOUT || 0;
     }
-}
-
-/**
- * Generates header values for request config
- * @param headerValues Header values object received from the front end
- */
-function getHeaders(headerValues: any): any {
-    let headerObject: any = {};
-    if (headerValues) {
-        headerObject = headerValues;
-    }
-    headerObject.Authorization = `Basic ${Base64.encode(ACCOUNT_NUMBER + ':' + LICENSE_KEY)}`;
-    return headerObject;
 }
 
 /**
@@ -84,24 +142,6 @@ function generateEndpointUrl(data: any): string {
     }
 
     return endpointUrl;
-}
-
-/**
- * Creates axios request configuration
- * @param data Request data
- */
-export async function createAxiosConfig(data: any): Promise<AxiosConfiguration | undefined> {
-    let requestConfiguration: AxiosConfiguration | undefined;
-    try {
-        await setATSettings();
-        if (data) {
-            requestConfiguration = new AxiosConfiguration(data);
-        }
-    } catch (err) {
-        console.error(err);
-        window.showErrorMessage(err);
-    }
-    return requestConfiguration;
 }
 
 /**
