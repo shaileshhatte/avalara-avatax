@@ -3,8 +3,9 @@
     "displayName": "Avalara AvaTax",
     "description": "AvaTax API Explorer",
     "version": "0.0.1",
+    "publisher": "Shailesh Hatte",
     "author": {
-        "email": "shailesh.hatte@avalara.com",
+        "email": "shaileshhatte@gmail.com",
         "name": "Shailesh Hatte"
     },
     "engines": {
