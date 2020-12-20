@@ -1,65 +1,102 @@
-# test-api README
+# Avalara AvaTax API Explorer
 
-This is the README for your extension "test-api". After writing up a brief description, we recommend including the following sections.
+Author: Shailesh Hatte (shaileshhatte@gmail.com) <br/><br/>
+Avalara AvaTax REST v2 API explorer is an extension that makes it easier and convinient to test AvaTax tax and address APIs right from the VS Code.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Here's how this extension makes it easier to test AvaTax APIs.
 
-For example if there is an image subfolder under your extension project workspace:
+<b>1. Launch API requests </b> <br/>
 
-\!\[feature X\]\(images/feature-x.png\)
+ <ul>
+  <li>
+      Click on an API endpoint. This will open two panels side by side each one for Request details and Response content.
+  </li>
+ </ul>
+  <br/>
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+ <image src="./media/gifs/API-request.gif" alt="Launch API request"/>
+ <br/><br/>
 
-## Requirements
+<b> 2. API Request Section Features </b> <br/>
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+<ul>
+Features:
+    <li>Request section makes it easier to see what request model is being used.</li>
+    <li>All mandatory fields are marked as such, without which the request cannot be launched.</li>
+    <li>Request body can be copied, prettified, and reset with original example.</li>
+</ul>
+
+   <image src="./media/gifs/Request-features.gif" alt="API Request section Features"/>
+    <br/><br/>
+
+<b> 3. Service Response section Features </b> <br/>
+
+<ul>
+Features:
+    <li>Resppnse section makes it easier to view all details about response such as header information, response content etc.</li>
+    <li>Response content can be copied, saved on disk as JSON or XML as applicable.</li>
+    <li>Generate request code snippets for current request in popular languages.</li>
+</ul>
+
+   <image src="./media/gifs/Response-features.gif" alt="Service Response section Features"/>
+   <br/><br/>
+
+<b> 4. VS Code Commands </b> <br/>
+
+<ul>
+    <li>Launch address or tax API right from within your project using commands.</li>
+</ul>
+
+   <image src="./media/gifs/VS-Code-Commands.gif" alt="VS Code Commands"/>
+   <br/><br/>
+
+<b> 5. Model Definitions </b> <br/>
+
+<ul>
+    <li>View example of a request model and also a entire model definition with type definitions of all attributes.</li>
+</ul>
+
+   <image src="./media/gifs/Model-definitions.gif" alt="Model Definitions"/>
+   <br/><br/>
+
+<b> 6. Generate TypeScript Interfaces </b> <br/>
+
+<ul>
+    <li>Generate TypeScript interfaces from a model.</li>
+</ul>
+
+   <image src="./media/gifs/Generate-TypeScript-Interface.gif" alt="Generate TypeScript Interfaces"/>
+   <br/><br/>
+
+<b> 6. Setup AvaTax Credentials </b> <br/>
+
+<ul>
+    <li>Setup AvaTax credentials via command.</li>
+</ul>
+
+   <image src="./media/gifs/Setup-Credentials.gif" alt="Setup AvaTax Credentials"/>
+   <br/><br/>
+
+> Note: The credentials are safely stored your system Keychain (MacOS) or Vault (Windows/Linux).
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+AvaTax environment (Sandbox/Production) can be selected in the extension Settings section.
 
-For example:
+<image src="./media/Extension Settings.png">
 
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+<br/>
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Sometimes you may face issues generating TypeScript interfaces from models.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
+Initial release of Avalara AvaTax REST API Explorer.
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+---
