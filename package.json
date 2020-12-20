@@ -4,6 +4,9 @@
     "description": "AvaTax API Explorer",
     "version": "0.0.1",
     "publisher": "shaileshhatte",
+    "repository": {
+        "url": "https://github.com/shaileshhatte/avalara-avatax"
+    },
     "author": {
         "email": "shaileshhatte@gmail.com",
         "name": "Shailesh Hatte"
