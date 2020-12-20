@@ -19,7 +19,7 @@ Here's how this extension makes it easier to test AvaTax APIs.
  <image src="./media/gifs/API-request.gif" alt="Launch API request"/>
  <br/>
 
-<> 2. API Request Section Features </> <br/>
+<b> 2. API Request Section Features </b> <br/>
 
 <ul>
 Features:
@@ -31,7 +31,7 @@ Features:
    <image src="./media/gifs/Request-features.gif" alt="API Request section Features"/>
     <br/>
 
-<> 3. Service Response section Features </> <br/>
+<b> 3. Service Response section Features </b> <br/>
 
 <ul>
 Features:
@@ -43,7 +43,7 @@ Features:
    <image src="./media/gifs/Response-features.gif" alt="Service Response section Features"/>
    <br/>
 
-<> 4. VS Code Commands </> <br/>
+<b> 4. VS Code Commands </b> <br/>
 
 <ul>
     <li>Launch address or tax API right from within your project using commands.</li>
@@ -52,7 +52,7 @@ Features:
    <image src="./media/gifs/VS-Code-Commands.gif" alt="VS Code Commands"/>
    <br/>
 
-<> 5. Model Definitions </> <br/>
+<b> 5. Model Definitions </b> <br/>
 
 <ul>
     <li>View example of a request model and also a entire model definition with type definitions of all attributes.</li>
@@ -61,7 +61,7 @@ Features:
    <image src="./media/gifs/Model-definitions.gif" alt="Model Definitions"/>
    <br/>
 
-<> 6. Generate TypeScript Interfaces </> <br/>
+<b> 6. Generate TypeScript Interfaces </b> <br/>
 
 <ul>
     <li>Generate TypeScript interfaces from a model.</li>
@@ -70,7 +70,7 @@ Features:
    <image src="./media/gifs/Generate-TypeScript-Interface.gif" alt="Generate TypeScript Interfaces"/>
    <br/>
 
-<> 6. Setup AvaTax Credentials </> <br/>
+<b> 6. Setup AvaTax Credentials </b> <br/>
 
 <ul>
     <li>Setup AvaTax credentials via command.</li>
