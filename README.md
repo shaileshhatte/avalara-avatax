@@ -1,7 +1,6 @@
 # Avalara AvaTax API Explorer
 
-Author: Shailesh Hatte (shaileshhatte@gmail.com) <br/><br/>
-Avalara AvaTax REST v2 API explorer is an extension that makes it easier and convinient to test AvaTax tax and address APIs right from the VS Code.
+<br/>Avalara AvaTax REST v2 API explorer is an extension that makes it easier and convinient to test AvaTax tax and address APIs right from the VS Code.
 
 ## Features
 
@@ -100,3 +99,5 @@ Sometimes you may face issues generating TypeScript interfaces from models.
 Initial release of Avalara AvaTax REST API Explorer.
 
 ---
+
+Author: Shailesh Hatte (https://github.com/shaileshhatte/) <br/>
