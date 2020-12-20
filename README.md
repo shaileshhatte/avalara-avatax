@@ -16,7 +16,7 @@ Here's how this extension makes it easier to test AvaTax APIs.
  </ul>
   <br/>
 
- <image src="https://github.com/shaileshhatte/avalara-avatax/blob/master/media/gifs/API-request.gif" alt="Launch API request"/>
+ <image src="https://github.com/shaileshhatte/avalara-avatax/raw/master/media/gifs/API-request.gif" alt="Launch API request" />
  <br/><br/>
 
 <b> 2. API Request Section Features </b> <br/>
