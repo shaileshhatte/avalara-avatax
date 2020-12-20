@@ -1,7 +1,7 @@
 {
     "name": "avalara-avatax",
-    "displayName": "Avalara AvaTax",
-    "description": "AvaTax REST API Explorer",
+    "displayName": "Avalara AvaTax API Explorer",
+    "description": "Test AvaTax APIs without leaving IDE",
     "version": "1.0.0",
     "publisher": "shaileshhatte",
     "repository": {
@@ -38,7 +38,7 @@
         "onCommand:model.launch",
         "onCommand:model.generate.tsmodel"
     ],
-    "main": "./dist/extension.js",
+    "main": "./out/extension.js",
     "contributes": {
         "commands": [
             {
@@ -223,14 +223,12 @@
         }
     },
     "scripts": {
+        "vscode:prepublish": "tsc",
         "compile": "tsc -p ./",
         "lint": "eslint src --ext ts",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",
         "test": "node ./out/test/runTest.js",
-        "vscode:prepublish": "webpack --mode production",
-        "webpack": "webpack --mode development",
-        "webpack-dev": "webpack --mode development --watch",
         "test-compile": "tsc -p ./"
     },
     "devDependencies": {
