@@ -15,7 +15,7 @@ let contentDisposition: any = {};
  */
 export async function processResponse(result: any) {
     svcResult = result.isAxiosError ? result.response : result;
-    console.log(svcResult);
+
     contentType = ``;
     contentDisposition = {
         attachment: false,
@@ -92,8 +92,6 @@ function generateResponseHtml(result: AxiosResponse): string {
     const bodyContent = responseBodyAsHtml(result.data || result.statusText, result.headers['content-type'] || '');
     const headTagContent = getHeadTagContent();
     const scriptTagContent = getScriptTagContent();
-
-    //console.log(result);
 
     try {
         htmlContent += `<html> 

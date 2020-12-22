@@ -5,4 +5,4 @@
 /out
 /temp/**
 !/temp/**.txt
-media/gifs/.DS_Store
+**/.DS_Store

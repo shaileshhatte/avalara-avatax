@@ -23,7 +23,6 @@ export function launchEndpoint(): void {
         if (arguments[0]) {
             endpoint = arguments[0];
             if (!endpoint) {
-                console.log(SOMETHING_WENT_WRONG);
                 vscode.window.showErrorMessage(SOMETHING_WENT_WRONG);
                 return;
             }

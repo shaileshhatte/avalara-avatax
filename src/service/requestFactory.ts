@@ -56,30 +56,20 @@ class AxiosConfiguration implements axiosModule.AxiosRequestConfig {
     constructor(data: any) {
         // If there is a file to be uploaded
         if (!!data.parameters.filePath) {
-            // const fileUri = Uri.file(data.parameters.filePath);
-            // console.log(fileUri);
-            // const form = new FormData();
-            // form.append('file', fs.createReadStream(path.resolve(data.parameters.filePath)));
-
             const content = fs.readFileSync(path.resolve(data.parameters.filePath), {
                 encoding: `base64`
             });
-
-            // console.log(content);
 
             this.data = {
                 file: content
             };
 
             this.headers['Content-Type'] = 'multipart/form-data';
-            // this.headers = form.getHeaders() ? form.getHeaders() : {};
         }
         this.url = generateEndpointUrl(data);
         this.data = data.reqbody ? (data.reqbody !== `NA` ? JSON.parse(data.reqbody) : ``) : ``;
         // If there is a file to be uploaded
         if (!!data.parameters.filePath) {
-            // const fileUri = Uri.file(data.parameters.filePath);
-            // console.log(fileUri);
             const form = new FormData();
             form.append('file', fs.createReadStream(path.resolve(data.parameters.filePath)));
             this.data = form;

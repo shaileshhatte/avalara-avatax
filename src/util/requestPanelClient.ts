@@ -17,7 +17,7 @@ export function getHeadContent(nonce: string): string {
         const avacontext: vscode.ExtensionContext = AvaWebView.extensionContext;
 
         const stylePathOnDisk = vscode.Uri.joinPath(avacontext.extensionUri, 'static', 'css', 'requestStyle.css');
-        // console.log(stylePathOnDisk);
+
         const styleUri = AvaWebView.reqPanel?.webview.asWebviewUri(stylePathOnDisk);
         htmlContent += `<link nonce='${nonce}' rel='stylesheet' href='${styleUri}'>`;
     } catch (err) {

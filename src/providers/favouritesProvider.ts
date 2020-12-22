@@ -48,7 +48,6 @@ export class FavouriteEndPointsProvider implements vscode.TreeDataProvider<Endpo
 
     getChildren(element?: ApiCategory | EndpointTreeItem): Thenable<EndpointTreeItem[] | ApiCategory[]> {
         if (element instanceof ApiCategory) {
-            // console.log();
             return Promise.resolve(generateApiEndpointTreeItems(element.label));
         } else {
             return Promise.resolve(generateApiCategories());
@@ -59,8 +58,6 @@ export class FavouriteEndPointsProvider implements vscode.TreeDataProvider<Endpo
     readonly onDidChangeTreeData: vscode.Event<EndpointTreeItem | ApiCategory | undefined> = this._onDidChangeTreeData.event;
 
     refresh(element?: any): void {
-        console.log(`refreshed`);
-
         if (element) {
             const tag = element.tag;
             const endpointsWithTag = favouriteEndpointsJson.endpoints.filter((ep: any) => {
@@ -158,8 +155,6 @@ function generateApiEndpointTreeItems(tag: string): EndpointTreeItem[] {
 }
 
 export function removeFromFavourites() {
-    //  console.log(arguments);
-
     if (!arguments) {
         return;
     }
@@ -168,7 +163,7 @@ export function removeFromFavourites() {
         let jsonContent: any = favouriteEndpointsJson;
         let endpoints: any[] = favouriteEndpointsJson.endpoints || [];
         const index = endpoints.findIndex((ep) => {
-            return ep.label === arguments[0].label && ep.method == arguments[0].endpoint.method && ep.tag === arguments[0].endpoint.tag;
+            return ep.label === arguments[0].label && ep.method === arguments[0].endpoint.method && ep.tag === arguments[0].endpoint.tag;
         });
         if (index >= 0) {
             const deletedElements = endpoints.splice(index, 1);

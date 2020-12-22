@@ -47,7 +47,6 @@ export class EndPointsProvider implements vscode.TreeDataProvider<EndpointTreeIt
 
     getChildren(element?: ApiCategory | EndpointTreeItem): Thenable<EndpointTreeItem[] | ApiCategory[]> {
         if (element instanceof ApiCategory) {
-            // console.log();
             return Promise.resolve(generateApiEndpointTreeItems(element.label));
         } else {
             return Promise.resolve(generateApiCategories());
@@ -196,7 +195,7 @@ export function generateApiEndpointQuickPickItems(apiCategory: string): Endpoint
     try {
         const apiEndpoints: EndpointTreeItem[] = generateApiEndpointTreeItems(apiCategory);
         apiEndpoints.forEach((ep) => {
-            const qpItem: EndpointQuickPickItem = new EndpointQuickPickItem(ep.label || ep.endpoint.urlLabel, ep.description, ep.endpoint.description, ep.endpoint);
+            const qpItem: EndpointQuickPickItem = new EndpointQuickPickItem(ep.label?.toString() || ep.endpoint.urlLabel.toString(), ep.description, ep.endpoint.description, ep.endpoint);
             quickPickItems.push(qpItem);
         });
     } catch (err) {
@@ -274,9 +273,6 @@ export function getTestConnectionEndpoint(): EndpointMethod | undefined {
 }
 
 export function addToFavourites() {
-    // console.log(`Inside addToFavourites`);
-    // console.log(arguments[0]);
-
     try {
         let jsonContent: any = favouriteEndpointsJson;
         const endpoints: any[] = favouriteEndpointsJson.endpoints || [];
